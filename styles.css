@@ -376,6 +376,9 @@ html:not(.js) .reading__empty { display: none; }
 }
 .motion .paper__orb .orb { opacity: var(--o, 1); }
 .motion .paper__head {
+  /* Свой фон: текст читается, даже если сфера ещё не закрыла центр */
+  background: var(--sheet);
+  padding: 24px;
   opacity: var(--h, 0);
   transform: translateY(calc((1 - var(--h, 0)) * 28px));
 }
