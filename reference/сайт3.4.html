@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HTDC · Четыре измерения</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@300;400;500&family=Inter:wght@300&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#050810;
+--wht:#E0E4EC;
+--dim:#5A606C;
+--gray:#3A404C;
+--glass-text:#A8B0C0;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--wht);font-weight:300;line-height:1.6;-webkit-font-smoothing:antialiased}
+
+#canvas{position:fixed;inset:0;z-index:0}
+.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 85% 85% at 50% 50%, transparent 40%, rgba(5,8,16,0.6) 85%, rgba(5,8,16,1) 100%)}
+
+.nav{position:fixed;top:0;left:0;right:0;padding:36px 56px;display:flex;justify-content:space-between;align-items:center;z-index:100}
+.nav-logo{font-family:'Cormorant SC',serif;font-size:20px;letter-spacing:.4em;color:var(--glass-text);font-weight:400;text-decoration:none;transition:color .6s}
+.nav-logo:hover{color:var(--wht)}
+.nav-enter{background:transparent;border:none;color:var(--dim);font-family:'Inter';font-size:9px;letter-spacing:.5em;text-transform:uppercase;cursor:pointer;transition:color .6s;padding:0;font-weight:300}
+.nav-enter:hover{color:var(--wht)}
+
+.hero{position:relative;z-index:10;height:100vh;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.hero-content{position:relative;width:100%;height:100%;pointer-events:auto;z-index:11;display:flex;align-items:center;justify-content:center;}
+
+.measures-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  padding: 15vh 12vw; 
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.row-top { display: flex; justify-content: space-between; width: 100%; }
+.row-bottom { display: flex; justify-content: space-between; width: 100%; }
+
+/* Шрифт как на втором слайде */
+.measure-item {
+  font-family: 'Cormorant SC', serif;
+  font-size: clamp(28px, 3vw, 44px); 
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: .1em; 
+  color: var(--wht);
+  opacity: 0;
+  text-shadow: 0 4px 20px rgba(5,8,16,0.9);
+  animation: appear 3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.top-left { animation-delay: 1.2s; }
+.top-right { animation-delay: 1.6s; text-align: right; }
+.bottom-left { animation-delay: 2.0s; }
+.bottom-right { animation-delay: 2.4s; text-align: right; }
+
+@keyframes appear{from{opacity:0;transform:translateY(20px);filter:blur(8px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+
+.sig-left{position:fixed;bottom:28px;left:56px;font-size:8px;letter-spacing:.5em;color:var(--gray);text-transform:uppercase;z-index:20;opacity:0;animation:fadeIn 3s ease 4s forwards;font-family:'Inter';font-weight:300}
+.sig-right{position:fixed;bottom:28px;right:56px;font-size:8px;letter-spacing:.5em;color:var(--gray);text-transform:uppercase;z-index:20;opacity:0;animation:fadeIn 3s ease 4.2s forwards;font-family:'Inter';font-weight:300}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+@media(max-width:900px){
+.nav{padding:24px 24px}
+.measures-container { padding: 10vh 8vw; }
+.measure-item {font-size: 20px;}
+.sig-left{left:24px;bottom:20px}
+.sig-right{right:24px;bottom:20px}
+}
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+<div class="vignette"></div>
+
+<nav class="nav">
+<a href="2-chelovek.html" class="nav-logo">HTDC</a>
+<button class="nav-enter">Войти</button>
+</nav>
+
+<section class="hero">
+<div class="hero-content">
+  <div class="measures-container">
+    <div class="row-top">
+      <div class="measure-item top-left">Воля</div>
+      <div class="measure-item top-right">Смысл</div>
+    </div>
+    <div class="row-bottom">
+      <div class="measure-item bottom-left">Концентрация</div>
+      <div class="measure-item bottom-right">Сомнения</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<div class="sig-left">V7 · Инверсия энтропии</div>
+<div class="sig-right">III · ММXXVI</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+
+let time = 0;
+const particles = [];
+const PARTICLE_COUNT = 100; 
+const focus = { x: 0.5, y: 0.5 }; 
+const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
+window.addEventListener('mousemove', (e) => {
+  mouse.tx = (e.clientX / window.innerWidth - 0.5);
+  mouse.ty = (e.clientY / window.innerHeight - 0.5);
+});
+
+class MistParticle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.depth = Math.random(); 
+    const speedMult = 0.2 + this.depth * 1.5;
+    this.vx = (Math.random() - 0.5) * 0.1 * speedMult;
+    this.vy = (Math.random() - 0.5) * 0.1 * speedMult;
+    this.size = 20 + this.depth * 200; 
+    this.alpha = 0.02 - (this.depth * 0.015); 
+    this.phase = Math.random() * Math.PI * 2;
+    this.phaseSpeed = 0.001 + Math.random() * 0.002;
+    if (Math.random() < 0.7) {
+      this.x = W * (0.3 + Math.random() * 0.4);
+      this.y = H * (0.3 + Math.random() * 0.4);
+    }
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy; this.phase += this.phaseSpeed;
+    this.x += Math.sin(this.phase + time * 0.18) * 0.08;
+    this.y += Math.cos(this.phase * 0.6 + time * 0.14) * 0.08;
+    if (this.x < -this.size) this.x = W + this.size;
+    if (this.x > W + this.size) this.x = -this.size;
+    if (this.y < -this.size) this.y = H + this.size;
+    if (this.y > H + this.size) this.y = -this.size;
+  }
+  draw(cx, cy) {
+    const dx = this.x - cx, dy = this.y - cy;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const lightRadius = Math.min(W, H) * (0.5 + this.depth * 0.3);
+    const proximity = Math.max(0, 1 - dist / lightRadius);
+    const warmGlow = Math.pow(proximity, 2.5);
+
+    const g = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+    const a = this.alpha;
+    const r = 120 + this.depth * 20;
+    const gCol = 145 + this.depth * 20;
+    const b = 190 + this.depth * 10;
+    
+    g.addColorStop(0, `rgba(${r}, ${gCol}, ${b}, ${a * 1.5})`);
+    g.addColorStop(0.5, `rgba(${r*0.7}, ${gCol*0.7}, ${b*0.8}, ${a * 0.6})`);
+    g.addColorStop(1, `rgba(40, 55, 85, 0)`);
+    
+    ctx.filter = `blur(${(1 - this.depth) * 4}px)`; 
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+    ctx.filter = 'none';
+
+    if (warmGlow > 0.05) {
+      const warm = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+      warm.addColorStop(0, `rgba(255, 230, 180, ${warmGlow * 0.2 * (1 + this.depth)})`);
+      warm.addColorStop(0.5, `rgba(230, 190, 130, ${warmGlow * 0.1})`);
+      warm.addColorStop(1, `rgba(212, 184, 122, 0)`);
+      
+      ctx.filter = `blur(${(1 - this.depth) * 6}px)`;
+      ctx.fillStyle = warm;
+      ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+      ctx.filter = 'none';
+    }
+  }
+}
+
+for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new MistParticle());
+
+function drawCore(cx, cy, pulse) {
+  // ЕДИНОЕ ЯДРО. Просто белый центр и плавный переход в туман.
+  // Радиус увеличен (750), но это ОДИН градиент.
+  const size = 750; 
+  const core = ctx.createRadialGradient(cx, cy, 0, cx, cy, size);
+  
+  core.addColorStop(0, `rgba(255, 255, 255, 1)`); 
+  core.addColorStop(0.05, `rgba(255, 252, 245, ${0.9})`); // Плавный уход от белого
+  core.addColorStop(0.2, `rgba(255, 240, 210, ${0.4})`); // Теплый оттенок
+  core.addColorStop(0.5, `rgba(212, 184, 122, 0.05)`); // Растворение в прозрачность
+  core.addColorStop(1, `rgba(0, 0, 0, 0)`);
+  
+  ctx.fillStyle = core;
+  ctx.beginPath(); ctx.arc(cx, cy, size, 0, Math.PI * 2); ctx.fill();
+}
+
+function render() {
+  time += 0.014;
+  mouse.x += (mouse.tx - mouse.x) * 0.025;
+  mouse.y += (mouse.ty - mouse.y) * 0.025;
+  
+  const bg = ctx.createRadialGradient(W * 0.5, H * 0.5, 0, W * 0.5, H * 0.5, Math.max(W, H) * 1.0);
+  bg.addColorStop(0, '#0C111E'); 
+  bg.addColorStop(0.6, '#050810');
+  bg.addColorStop(1, '#020408');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+  
+  const cx = W * focus.x + mouse.x * 15; 
+  const cy = H * focus.y + mouse.y * 15;
+  const pulse = Math.sin(time * 0.8) * 0.5 + 0.5;
+  
+  particles.sort((a, b) => a.depth - b.depth);
+  particles.forEach(p => { p.update(); p.draw(cx, cy); });
+  drawCore(cx, cy, pulse);
+  
+  requestAnimationFrame(render);
+}
+
+render();
+window.addEventListener('resize', () => particles.forEach(p => p.reset()));
+</script>
+</body>
+</html>
