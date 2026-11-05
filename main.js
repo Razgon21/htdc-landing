@@ -1,4 +1,4 @@
-/* HTDC — туман и свет на фоне, карта разрывов, ситуации, заявка. Без зависимостей. */
+/* HTDC — свет и туман на фоне, сфера, ситуации, сцена раскрытия, заявка. Без зависимостей. */
 
 // Куда уходит заявка. Пока null — отправка имитируется.
 const FORM_ENDPOINT = null;
@@ -9,10 +9,12 @@ const SAMPLE_URL = null;
   "use strict";
 
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
-  document.documentElement.classList.add("js");
-  if (!reduceMotion.matches && "IntersectionObserver" in window) {
-    document.documentElement.classList.add("motion");
-  }
+  const root = document.documentElement;
+  root.classList.add("js");
+  const motion = !reduceMotion.matches && "IntersectionObserver" in window;
+  if (motion) root.classList.add("motion");
+
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 
   /* ---------- Навигация: прозрачная только над первым экраном ---------- */
   const nav = document.querySelector(".nav");
@@ -45,12 +47,22 @@ const SAMPLE_URL = null;
     [0.45, "rgba(78,96,130,0.22)"],
     [1, "rgba(40,55,85,0)"],
   ]);
+  // Свет без сферы: мягкий источник в тумане
   const LIGHT = sprite(512, [
     [0, "rgba(255,255,255,1)"],
     [0.035, "rgba(240,247,255,0.92)"],
     [0.12, "rgba(200,222,245,0.42)"],
     [0.3, "rgba(130,160,200,0.13)"],
     [0.6, "rgba(80,105,145,0.04)"],
+    [1, "rgba(60,80,120,0)"],
+  ]);
+  // Ореол вокруг сферы: яркий у края и быстро гаснет
+  const HALO = sprite(512, [
+    [0, "rgba(230,242,255,0.95)"],
+    [0.3, "rgba(200,222,248,0.7)"],
+    [0.36, "rgba(160,190,230,0.34)"],
+    [0.5, "rgba(110,140,190,0.12)"],
+    [0.75, "rgba(70,95,140,0.04)"],
     [1, "rgba(60,80,120,0)"],
   ]);
 
@@ -85,13 +97,15 @@ const SAMPLE_URL = null;
     frame(performance.now(), true);
   }
 
-  // Свет ходит по истории страницы: у секций есть data-light="x,y,сила"
+  // Свет ходит по истории страницы: data-light="x,y,сила" или "orb,сила" — тогда свет стоит за сферой секции
   const stops = [...document.querySelectorAll("[data-light]")].map((el) => {
-    const [x, y, k] = el.dataset.light.split(",").map(Number);
+    const parts = el.dataset.light.split(",");
+    if (parts[0] === "orb") return { el, orb: el.querySelector(".orb"), k: Number(parts[1]) };
+    const [x, y, k] = parts.map(Number);
     return { el, x, y, k };
   });
-  const light = { x: 0.7, y: 0.46, k: 1, tx: 0.7, ty: 0.46, tk: 1 };
-  const pointer = { x: 0, y: 0, tx: 0, ty: 0, onMap: false, mx: 0, my: 0 };
+  const light = { x: 0.7, y: 0.45, k: 1, size: 0, halo: 0, locked: false, stop: null };
+  const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
 
   function pickStop() {
     const mid = innerHeight / 2;
@@ -110,37 +124,37 @@ const SAMPLE_URL = null;
     pointer.ty = e.clientY / innerHeight - 0.5;
   }, { passive: true });
 
-  // Над картой свет становится «линзой» и идёт за курсором
-  const map = document.querySelector(".map__stack");
-  const real = document.querySelector(".map__real");
-  if (map) {
-    map.addEventListener("pointermove", (e) => {
-      if (e.pointerType !== "mouse") return;
-      pointer.onMap = true;
-      pointer.mx = e.clientX / innerWidth;
-      pointer.my = e.clientY / innerHeight;
-    });
-    map.addEventListener("pointerleave", () => { pointer.onMap = false; });
-  }
-
   let last = 0;
   function frame(now, still) {
     const t = now * 0.001;
     const s = pickStop();
     const drift = still ? 0 : 1;
+    if (s !== light.stop) { light.stop = s; light.locked = false; }
 
-    if (pointer.onMap && s.el.classList.contains("hero")) {
-      light.tx = pointer.mx; light.ty = pointer.my;
+    let tx, ty, tsize, thalo;
+    const orbRect = s.orb && s.orb.getBoundingClientRect();
+    if (orbRect && orbRect.width > 0) {
+      // Сфера статична: свет стоит ровно за ней, без дрейфа и параллакса
+      const r = orbRect;
+      tx = (r.left + r.width / 2) / innerWidth;
+      ty = (r.top + r.height / 2) / innerHeight;
+      tsize = Math.min(r.width * 3.1, Math.max(W, H) * 2.2) * SCALE;
+      thalo = 1;
     } else {
-      light.tx = s.x + Math.sin(t * 0.11) * 0.09 * drift;
-      light.ty = s.y + Math.cos(t * 0.083) * 0.07 * drift;
+      tx = (s.x ?? 0.5) + Math.sin(t * 0.11) * 0.09 * drift;
+      ty = (s.y ?? 0.4) + Math.cos(t * 0.083) * 0.07 * drift;
+      tsize = Math.min(W, H) * SCALE * (0.9 + 0.5 * s.k);
+      thalo = 0;
     }
-    light.tk = s.k;
 
-    const ease = still ? 1 : 0.035;
-    light.x += (light.tx - light.x) * ease;
-    light.y += (light.ty - light.y) * ease;
-    light.k += (light.tk - light.k) * ease;
+    // Переход между секциями плавный; у сферы свет «прилипает» и дальше идёт за ней без отставания
+    const ease = still || light.locked ? 1 : 0.04;
+    light.x += (tx - light.x) * ease;
+    light.y += (ty - light.y) * ease;
+    light.k += (s.k - light.k) * ease;
+    light.size += (tsize - light.size) * (still ? 1 : 0.06);
+    light.halo += (thalo - light.halo) * (still ? 1 : 0.05);
+    if (orbRect && orbRect.width > 0 && Math.hypot(tx - light.x, ty - light.y) < 0.004) light.locked = true;
     pointer.x += (pointer.tx - pointer.x) * 0.03;
     pointer.y += (pointer.ty - pointer.y) * 0.03;
 
@@ -150,10 +164,11 @@ const SAMPLE_URL = null;
     ctx.fillStyle = BG;
     ctx.fillRect(0, 0, cw, ch);
 
-    const lx = (light.x + pointer.x * 0.02) * cw;
-    const ly = (light.y + pointer.y * 0.02) * ch;
+    const par = 1 - light.halo; // у сферы параллакса нет
+    const lx = (light.x + pointer.x * 0.02 * par) * cw;
+    const ly = (light.y + pointer.y * 0.02 * par) * ch;
 
-    // Туман, гуще у света
+    // Туман; у сферы расходится к краям, у мягкого света — гуще рядом с ним
     const dt = still ? 0 : Math.min(now - last, 50);
     for (const p of particles) {
       p.phase += p.speed * dt * 6;
@@ -164,47 +179,73 @@ const SAMPLE_URL = null;
       const px = p.x * cw, py = p.y * ch;
       const dx = (px - lx) / big, dy = (py - ly) / big;
       const near = Math.max(0, 1 - Math.sqrt(dx * dx + dy * dy) * 1.6);
-      ctx.globalAlpha = Math.min(1, p.alpha * (0.6 + near * 1.6 * light.k));
+      const boost = near * 1.6 * light.k * (1 - light.halo * 1.3);
+      ctx.globalAlpha = clamp(p.alpha * (0.6 + boost), 0.03, 1);
       ctx.drawImage(FOG, px - size / 2, py - size / 2, size, size);
     }
 
-    // Свет — один источник, складывается с туманом
-    const ls = Math.min(cw, ch) * (0.9 + 0.5 * light.k) * (1 + Math.sin(t * 0.6) * 0.03 * drift);
     ctx.globalCompositeOperation = "lighter";
-    ctx.globalAlpha = 0.55 * light.k;
-    ctx.drawImage(LIGHT, lx - ls / 2, ly - ls / 2, ls, ls);
-
-    // Карта проявляется там, где свет
-    if (real) {
-      const r = map.getBoundingClientRect();
-      if (r.bottom > 0 && r.top < innerHeight) {
-        const mx = ((lx / SCALE) - r.left) / r.width * 100;
-        const my = ((ly / SCALE) - r.top) / r.height * 100;
-        real.style.setProperty("--mx", mx.toFixed(1) + "%");
-        real.style.setProperty("--my", my.toFixed(1) + "%");
-      }
+    const ls = light.size;
+    if (light.halo < 1) {
+      ctx.globalAlpha = 0.55 * light.k * (1 - light.halo);
+      ctx.drawImage(LIGHT, lx - ls / 2, ly - ls / 2, ls, ls);
+    }
+    if (light.halo > 0) {
+      ctx.globalAlpha = 0.6 * Math.min(light.k, 1.2) * light.halo;
+      ctx.drawImage(HALO, lx - ls / 2, ly - ls / 2, ls, ls);
     }
 
     last = now;
-    if (!still && !reduceMotion.matches) requestAnimationFrame(frame);
+    if (!still && motion) requestAnimationFrame(frame);
   }
 
   addEventListener("resize", resize, { passive: true });
   resize();
-  if (reduceMotion.matches) {
-    // Один статичный кадр; карта видна целиком
-    real && real.style.setProperty("--r", "90%");
-    addEventListener("scroll", () => frame(performance.now(), true), { passive: true });
-  } else {
+  if (motion) {
     requestAnimationFrame((n) => { last = n; frame(n); });
+  } else {
+    // Без движения: один кадр на каждое изменение прокрутки
+    let queued = false;
+    addEventListener("scroll", () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => { queued = false; frame(performance.now(), true); });
+    }, { passive: true });
+  }
+
+  /* ---------- Сцена: сфера заливает экран светом, из неё проявляется лист ---------- */
+  const scene = document.querySelector("[data-paper-scene]");
+  if (scene && motion) {
+    const orb = scene.querySelector(".paper__orb");
+    const head = scene.querySelector(".paper__head");
+    let queued = false;
+    const update = () => {
+      queued = false;
+      const r = scene.getBoundingClientRect();
+      const vh = innerHeight;
+      const p = clamp(-r.top / Math.max(1, r.height - vh));
+      const cover = Math.hypot(innerWidth, vh) / 160 * 1.06;
+      const grow = clamp(p / 0.62);
+      orb.style.setProperty("--s", (1 + (cover - 1) * grow ** 2.4).toFixed(3));
+      orb.style.setProperty("--o", (1 - clamp((p - 0.12) / 0.34)).toFixed(3));
+      head.style.setProperty("--h", clamp((p - 0.6) / 0.24).toFixed(3));
+    };
+    const request = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
+    addEventListener("scroll", request, { passive: true });
+    addEventListener("resize", request, { passive: true });
+    update();
   }
 
   /* ---------- Ситуации ---------- */
-  const list = document.querySelector("[data-situations]");
-  if (list) {
-    const summary = document.querySelector(".situations__summary");
-    const count = summary.querySelector("[data-count]");
-    const chosen = new Set();
+  const checks = document.querySelector("[data-checks]");
+  if (checks) {
+    const reading = document.getElementById("reading");
+    const empty = reading.querySelector("[data-empty]");
+    const cta = reading.querySelector("[data-cta]");
+    const bar = document.querySelector("[data-bar]");
+    const count = bar.querySelector("[data-count]");
+    const items = new Map([...reading.querySelectorAll("[data-for]")].map((a) => [a.dataset.for, a]));
+    const boxes = [...checks.querySelectorAll("input[type=checkbox]")];
 
     const plural = (n) => {
       const m10 = n % 10, m100 = n % 100;
@@ -213,37 +254,42 @@ const SAMPLE_URL = null;
       return "ситуаций";
     };
 
-    list.addEventListener("click", (e) => {
-      const btn = e.target.closest(".sit__toggle");
-      if (!btn) return;
-      const on = btn.getAttribute("aria-pressed") !== "true";
-      btn.setAttribute("aria-pressed", on);
-      btn.setAttribute("aria-expanded", on);
-      btn.parentElement.toggleAttribute("data-on", on);
-      on ? chosen.add(btn.textContent.trim()) : chosen.delete(btn.textContent.trim());
-      const n = chosen.size;
-      count.textContent = n ? `Отмечено: ${n} ${plural(n)}` : "Пока ничего не отмечено.";
-      summary.toggleAttribute("data-has", n > 0);
-    });
+    const sync = () => {
+      let n = 0;
+      for (const box of boxes) {
+        const on = box.checked;
+        n += on;
+        box.closest(".check").toggleAttribute("data-on", on);
+        items.get(box.value)?.toggleAttribute("data-on", on);
+      }
+      empty.hidden = n > 0;
+      cta.toggleAttribute("data-has", n > 0);
+      bar.toggleAttribute("data-has", n > 0);
+      count.textContent = `Отмечено: ${n} ${plural(n)}`;
+    };
+    checks.addEventListener("change", sync);
+    sync();
 
-    // Плашка на телефоне видна, только пока секция на экране
-    new IntersectionObserver(([e]) => summary.toggleAttribute("data-visible", e.isIntersecting))
-      .observe(list);
+    // Плашка на телефоне видна, только пока список на экране
+    new IntersectionObserver(([e]) => bar.toggleAttribute("data-visible", e.isIntersecting))
+      .observe(checks);
 
     // Выбор уезжает в форму заявки
-    summary.querySelector("[data-discuss]").addEventListener("click", () => {
+    cta.querySelector("[data-discuss]").addEventListener("click", () => {
       const message = document.getElementById("f-message");
-      if (message && chosen.size && !message.value.trim()) {
-        message.value = "Узнаём у себя:\n" + [...chosen].map((s) => "— " + s).join("\n");
+      const chosen = boxes.filter((b) => b.checked).map((b) => b.nextElementSibling.textContent.trim());
+      if (message && chosen.length && !message.value.trim()) {
+        message.value = "Узнаём у себя:\n" + chosen.map((s) => "— " + s).join("\n");
       }
     });
   }
 
   /* ---------- Появление частей секций ---------- */
-  if (document.documentElement.classList.contains("motion")) {
+  if (motion) {
     const groups = document.querySelectorAll(
-      ".hero__text, .situations__intro, .not__head, .not__list, .lens, .process__head, .steps, .process__terms, " +
-      ".paper__head, .case, .formats > .h2, .formats__grid, .faq > .h2, .faq__list, .contact__intro, .form"
+      ".hero__text, .situations__head, .checks, .not__head, .not__rows, .lens__title, .lens__grid, " +
+      ".process__head, .steps, .process__terms, .case, .formats > .h2, .formats__grid, " +
+      ".faq > .h2, .faq__list, .contact__intro, .form"
     );
     const io = new IntersectionObserver((entries) => {
       for (const e of entries) {
@@ -283,7 +329,7 @@ const SAMPLE_URL = null;
   const form = document.querySelector("[data-form]");
   if (form) {
     const status = form.querySelector(".form__status");
-    const checks = {
+    const checksForm = {
       name: (v) => v.trim().length >= 2 || "Напишите, как к вам обращаться.",
       company: (v) => v.trim().length >= 2 || "Напишите название компании.",
       // Принимаем любой привычный формат: +7 (999) 123-45-67, 89991234567, 8 999 123 45 67
@@ -292,7 +338,7 @@ const SAMPLE_URL = null;
     };
 
     function check(el) {
-      const rule = checks[el.name];
+      const rule = checksForm[el.name];
       if (!rule) return true;
       const res = rule(el.value, el);
       const err = document.getElementById(el.getAttribute("aria-describedby"));
@@ -307,7 +353,7 @@ const SAMPLE_URL = null;
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const fields = [...form.elements].filter((el) => checks[el.name]);
+      const fields = [...form.elements].filter((el) => checksForm[el.name]);
       const bad = fields.filter((el) => !check(el));
       if (bad.length) { bad[0].focus(); return; }
 

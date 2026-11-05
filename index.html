@@ -29,7 +29,7 @@
 
 <main id="main">
 
-  <section class="hero" id="top" data-light="0.70,0.46,1">
+  <section class="hero" id="top" data-light="orb,1">
     <div class="hero__text">
       <h1 class="hero__title">На бумаге всё сходится</h1>
       <p class="hero__lead">Организационная диагностика для компаний на 50–300 человек. Находим, где работа расходится с тем, как она устроена, и проверяем причину трёхнедельным экспериментом с замером «до» и «после».</p>
@@ -38,133 +38,102 @@
         <a class="link" href="#formats">Пример управленческой инструкции</a>
       </div>
     </div>
-
-    <figure class="map" aria-labelledby="map-caption">
-      <div class="map__stack" role="img" aria-label="Демонстрационная схема: оргструктура компании и реальные связи, которые идут в обход неё">
-      <!-- Слой «на бумаге»: формальная оргструктура -->
-      <svg class="map__svg map__paper" viewBox="0 0 480 390" aria-hidden="true">
-        <path d="M240 60 V95 M80 95 H400 M80 95 V130 M240 95 V130 M400 95 V130
-                 M80 170 V250 M240 170 V210 M190 210 H298 M190 210 V250 M298 210 V250 M400 170 V250"/>
-        <g class="map__nodes">
-          <rect x="170" y="20" width="140" height="40"/>
-          <rect x="20" y="130" width="120" height="40"/>
-          <rect x="170" y="130" width="140" height="40"/>
-          <rect x="340" y="130" width="120" height="40"/>
-          <rect x="30" y="250" width="100" height="40"/>
-          <rect x="145" y="250" width="90" height="40"/>
-          <rect x="245" y="250" width="106" height="40"/>
-          <rect x="360" y="250" width="80" height="40"/>
-        </g>
-        <g class="map__labels">
-          <text x="240" y="45">Собственник</text>
-          <text x="80" y="155">Коммерция</text>
-          <text x="240" y="155">Производство</text>
-          <text x="400" y="155">Финансы</text>
-          <text x="80" y="275">Продажи</text>
-          <text x="190" y="275">Цех</text>
-          <text x="298" y="275">Снабжение</text>
-          <text x="400" y="275">Учёт</text>
-        </g>
-      </svg>
-      <!-- Слой «на самом деле»: проявляется светом -->
-      <svg class="map__svg map__real" viewBox="0 0 480 390" aria-hidden="true">
-        <path class="map__flow" d="M60 250 C 10 190, 30 90, 170 50"/>
-        <path class="map__flow" d="M320 250 C 360 200, 340 80, 300 60"/>
-        <path class="map__flow map__flow--loop" d="M190 290 C 190 340, 80 340, 80 290"/>
-        <path class="map__cut" d="M250 95 H400"/>
-        <ellipse class="map__knot" cx="240" cy="40" rx="86" ry="34"/>
-        <g class="map__notes">
-          <text x="8" y="24" text-anchor="start">напрямую<tspan x="8" dy="19">к собственнику</tspan></text>
-          <text x="135" y="356" text-anchor="middle">цех и продажи<tspan x="135" dy="19">договариваются сами</tspan></text>
-          <text x="472" y="62" text-anchor="end">связь есть<tspan x="472" dy="19">только на схеме</tspan></text>
-        </g>
-      </svg>
-      </div>
-      <figcaption id="map-caption" class="map__caption">Серым — как устроено на бумаге. Светом — как идёт на самом деле. Демонстрационная схема.</figcaption>
-    </figure>
+    <div class="hero__orb" aria-hidden="true"><div class="orb"></div></div>
   </section>
 
-  <section class="situations" id="situations" aria-labelledby="situations-title" data-light="0.22,0.40,0.7">
-    <div class="situations__intro">
+  <section class="situations" id="situations" aria-labelledby="situations-title" data-light="0.12,0.30,0.6">
+    <div class="situations__head">
       <h2 id="situations-title" class="h2">Что из этого происходит у вас?</h2>
-      <p>Отметьте ситуации, которые узнаёте. Под каждой — где обычно прячется причина и что мы проверили бы первым делом.</p>
-      <p class="situations__note">Это не «плохие сотрудники». Чаще всего люди ведут себя разумно внутри правил, которые давно перестали подходить компании.</p>
-      <div class="situations__summary" aria-live="polite">
-        <p class="situations__count" data-count>Пока ничего не отмечено.</p>
-        <a class="btn" href="#contact" data-discuss>Обсудить эти ситуации</a>
+      <p>Отметьте всё, что узнаёте. Рядом появится, где обычно прячется причина и что мы проверили бы первым делом.</p>
+    </div>
+
+    <div class="situations__body">
+      <fieldset class="checks" data-checks>
+        <legend class="sr-only">Ситуации в компании</legend>
+        <label class="check"><input type="checkbox" value="s1"><span>Важное знают внизу, но до вас это не доходит</span></label>
+        <label class="check"><input type="checkbox" value="s2"><span>На совещании все согласны, а делают по-старому</span></label>
+        <label class="check"><input type="checkbox" value="s3"><span>Отделы выполняют свои планы, а компания в целом теряет</span></label>
+        <label class="check"><input type="checkbox" value="s4"><span>Одни и те же проблемы возвращаются, хотя регламенты написаны</span></label>
+        <label class="check"><input type="checkbox" value="s5"><span>Без вас ничего не решается</span></label>
+        <label class="check"><input type="checkbox" value="s6"><span>Сильные люди уходят, а причину называют личной</span></label>
+      </fieldset>
+
+      <div class="reading" id="reading" tabindex="-1">
+        <div class="reading__empty" data-empty>
+          <p class="reading__hint">Отметьте хотя бы одну ситуацию слева.</p>
+          <p>Это не «плохие сотрудники». Чаще всего люди ведут себя разумно внутри правил, которые давно перестали подходить компании.</p>
+        </div>
+        <div class="reading__items" aria-live="polite">
+          <article class="reading__item" data-for="s1">
+            <h3 class="reading__title">Важное знают внизу, но до вас это не доходит</h3>
+            <p><strong>Где обычно причина.</strong> Нести плохие новости наверх невыгодно или некому: тот, кто сообщил о проблеме, получает её в нагрузку.</p>
+            <p><strong>Что проверим.</strong> По каким путям на самом деле идёт информация и на каком шаге застревает.</p>
+          </article>
+          <article class="reading__item" data-for="s2">
+            <h3 class="reading__title">На совещании все согласны, а делают по-старому</h3>
+            <p><strong>Где обычно причина.</strong> Согласие на встрече ничего не стоит, а за отход от привычного порядка можно поплатиться.</p>
+            <p><strong>Что проверим.</strong> Что конкретный человек теряет, если сделает по-новому, и кто это замечает.</p>
+          </article>
+          <article class="reading__item" data-for="s3">
+            <h3 class="reading__title">Отделы выполняют свои планы, а компания в целом теряет</h3>
+            <p><strong>Где обычно причина.</strong> Цели и премии настроены так, что выигрыш одного отдела оплачивает соседний.</p>
+            <p><strong>Что проверим.</strong> Как показатели отделов связаны между собой и где они тянут в разные стороны.</p>
+          </article>
+          <article class="reading__item" data-for="s4">
+            <h3 class="reading__title">Одни и те же проблемы возвращаются, хотя регламенты написаны</h3>
+            <p><strong>Где обычно причина.</strong> Регламент описывает, как должно быть, а в работе давно есть обходной путь, и он удобнее.</p>
+            <p><strong>Что проверим.</strong> Каким путём работа идёт на деле и почему люди выбирают именно его.</p>
+          </article>
+          <article class="reading__item" data-for="s5">
+            <h3 class="reading__title">Без вас ничего не решается</h3>
+            <p><strong>Где обычно причина.</strong> Полномочия выданы на бумаге, но решить самому рискованнее, чем дождаться вас.</p>
+            <p><strong>Что проверим.</strong> Какие решения сотрудники могли бы принимать сами и что их останавливает.</p>
+          </article>
+          <article class="reading__item" data-for="s6">
+            <h3 class="reading__title">Сильные люди уходят, а причину называют личной</h3>
+            <p><strong>Где обычно причина.</strong> Лучшие первыми упираются в правила, которые мешают сделать работу хорошо.</p>
+            <p><strong>Что проверим.</strong> Что именно мешает тем, кто работает лучше всех, и сколько сил уходит на обход.</p>
+          </article>
+        </div>
+        <div class="reading__cta" data-cta>
+          <a class="btn" href="#contact" data-discuss>Обсудить эти ситуации</a>
+        </div>
       </div>
     </div>
 
-    <ol class="situations__list" role="list" data-situations>
-      <li class="sit">
-        <button class="sit__toggle" type="button" aria-pressed="false" aria-expanded="false" aria-controls="sit-1">Важное знают внизу, но до вас это не доходит</button>
-        <div class="sit__reading" id="sit-1">
-          <p><strong>Где обычно причина.</strong> Нести плохие новости наверх невыгодно или некому: тот, кто сообщил о проблеме, получает её в нагрузку.</p>
-          <p><strong>Что проверим.</strong> По каким путям на самом деле идёт информация и на каком шаге застревает.</p>
-        </div>
-      </li>
-      <li class="sit">
-        <button class="sit__toggle" type="button" aria-pressed="false" aria-expanded="false" aria-controls="sit-2">На совещании все согласны, а делают по-старому</button>
-        <div class="sit__reading" id="sit-2">
-          <p><strong>Где обычно причина.</strong> Согласие на встрече ничего не стоит, а за отход от привычного порядка можно поплатиться.</p>
-          <p><strong>Что проверим.</strong> Что конкретный человек теряет, если сделает по-новому, и кто это замечает.</p>
-        </div>
-      </li>
-      <li class="sit">
-        <button class="sit__toggle" type="button" aria-pressed="false" aria-expanded="false" aria-controls="sit-3">Отделы выполняют свои планы, а компания в целом теряет</button>
-        <div class="sit__reading" id="sit-3">
-          <p><strong>Где обычно причина.</strong> Цели и премии настроены так, что выигрыш одного отдела оплачивает соседний.</p>
-          <p><strong>Что проверим.</strong> Как показатели отделов связаны между собой и где они тянут в разные стороны.</p>
-        </div>
-      </li>
-      <li class="sit">
-        <button class="sit__toggle" type="button" aria-pressed="false" aria-expanded="false" aria-controls="sit-4">Одни и те же проблемы возвращаются, хотя регламенты написаны</button>
-        <div class="sit__reading" id="sit-4">
-          <p><strong>Где обычно причина.</strong> Регламент описывает, как должно быть, а в работе давно есть обходной путь, и он удобнее.</p>
-          <p><strong>Что проверим.</strong> Каким путём работа идёт на деле и почему люди выбирают именно его.</p>
-        </div>
-      </li>
-      <li class="sit">
-        <button class="sit__toggle" type="button" aria-pressed="false" aria-expanded="false" aria-controls="sit-5">Без вас ничего не решается</button>
-        <div class="sit__reading" id="sit-5">
-          <p><strong>Где обычно причина.</strong> Полномочия выданы на бумаге, но решить самому рискованнее, чем дождаться вас.</p>
-          <p><strong>Что проверим.</strong> Какие решения сотрудники могли бы принимать сами и что их останавливает.</p>
-        </div>
-      </li>
-      <li class="sit">
-        <button class="sit__toggle" type="button" aria-pressed="false" aria-expanded="false" aria-controls="sit-6">Сильные люди уходят, а причину называют личной</button>
-        <div class="sit__reading" id="sit-6">
-          <p><strong>Где обычно причина.</strong> Лучшие первыми упираются в правила, которые мешают сделать работу хорошо.</p>
-          <p><strong>Что проверим.</strong> Что именно мешает тем, кто работает лучше всех, и сколько сил уходит на обход.</p>
-        </div>
-      </li>
-    </ol>
+    <div class="situations__bar" data-bar>
+      <p data-count>Отмечено: 0</p>
+      <a class="btn" href="#reading">Что это значит</a>
+    </div>
   </section>
 
   <section class="field not" id="approach" aria-labelledby="not-title">
     <div class="not__head">
-      <h2 id="not-title" class="h2">Не тест, не тренинг и не софт</h2>
+      <h2 id="not-title" class="h2">Чем диагностика не является</h2>
       <p class="not__lead">Мы не оцениваем людей и ничего не внедряем. Мы смотрим на правила, в которых работает компания, и на то, как люди их обходят.</p>
     </div>
-    <ul class="not__list" role="list">
-      <li><h3 class="h3">Не тест личности</h3><p>Никаких опросников и типологий. Нас интересует не характер сотрудника, а то, что ему выгодно и что опасно в его работе.</p></li>
-      <li><h3 class="h3">Не тренинг</h3><p>Учить людей бессмысленно, пока не ясно, что им мешает. Сначала причина, потом решение.</p></li>
-      <li><h3 class="h3">Не программа</h3><p>Ничего не нужно внедрять и настраивать. На выходе документ и проверенный результат.</p></li>
-      <li><h3 class="h3">Не поиск виноватых</h3><p>Высказывания сотрудников обезличены. Фамилии в отчёт не попадают.</p></li>
+    <ul class="not__rows" role="list">
+      <li><h3 class="not__term">Не тест личности</h3><p>Никаких опросников и типологий. Нас интересует не характер сотрудника, а то, что ему выгодно и что опасно в его работе.</p></li>
+      <li><h3 class="not__term">Не тренинг</h3><p>Учить людей бессмысленно, пока не ясно, что им мешает. Сначала причина, потом решение.</p></li>
+      <li><h3 class="not__term">Не программа</h3><p>Ничего не нужно внедрять и настраивать. На выходе документ и проверенный результат.</p></li>
+      <li><h3 class="not__term">Не поиск виноватых</h3><p>Высказывания сотрудников обезличены. Фамилии в отчёт не попадают.</p></li>
     </ul>
+  </section>
 
-    <div class="lens">
-      <h3 class="lens__title">Что именно мы смотрим</h3>
+  <section class="lens" id="lens" aria-labelledby="lens-title" data-light="orb,1.25">
+    <h2 id="lens-title" class="h2 lens__title">Что именно мы смотрим</h2>
+    <div class="lens__stage">
+      <div class="lens__orb" aria-hidden="true"><div class="orb"></div></div>
       <dl class="lens__grid">
-        <div><dt>Решения</dt><dd>Кто на деле принимает решения и доводит их до конца, а кто только согласует.</dd></div>
-        <div><dt>Внимание</dt><dd>На что уходит время руководителей и что остаётся без присмотра.</dd></div>
-        <div><dt>Смысл</dt><dd>Понимают ли люди, зачем нужно правило, которое они выполняют.</dd></div>
-        <div><dt>Сомнения</dt><dd>Где люди перестраховываются, молчат или ждут команды сверху.</dd></div>
+        <div class="lens__q lens__q--tl"><dt>Решения</dt><dd>Кто на деле принимает решения и доводит их до конца, а кто только согласует.</dd></div>
+        <div class="lens__q lens__q--tr"><dt>Внимание</dt><dd>На что уходит время руководителей и что остаётся без присмотра.</dd></div>
+        <div class="lens__q lens__q--bl"><dt>Смысл</dt><dd>Понимают ли люди, зачем нужно правило, которое они выполняют.</dd></div>
+        <div class="lens__q lens__q--br"><dt>Сомнения</dt><dd>Где люди перестраховываются, молчат или ждут команды сверху.</dd></div>
       </dl>
     </div>
   </section>
 
-  <section class="process" id="process" aria-labelledby="process-title" data-light="0.80,0.30,0.6">
+  <section class="process" id="process" aria-labelledby="process-title" data-light="0.85,0.25,0.55">
     <div class="process__head">
       <h2 id="process-title" class="h2">Как проходит диагностика</h2>
       <p>Около <span class="draft">восьми недель</span> от первой беседы до замера «после». Компания всё это время работает как обычно: эксперимент идёт на одном участке.</p>
@@ -227,10 +196,16 @@
     </div>
   </section>
 
-  <section class="paper" id="example" aria-labelledby="example-title">
-    <div class="paper__head">
-      <h2 id="example-title" class="h2">Ход мысли на примере</h2>
-      <p class="paper__tag">Демонстрационный сценарий. Компания, ситуация и результат вымышлены, чтобы показать, как мы рассуждаем.</p>
+  <section class="paper" id="example" aria-labelledby="example-title" data-light="orb,1">
+    <!-- Сцена: сфера растёт и заливает экран светом, из неё проявляется светлый лист -->
+    <div class="paper__scene" data-paper-scene>
+      <div class="paper__stage">
+        <div class="paper__orb" aria-hidden="true"><div class="orb"></div></div>
+        <div class="paper__head">
+          <h2 id="example-title" class="h2">Ход мысли на примере</h2>
+          <p class="paper__tag">Демонстрационный сценарий. Компания, ситуация и результат вымышлены, чтобы показать, как мы рассуждаем.</p>
+        </div>
+      </div>
     </div>
     <ol class="case" role="list">
       <li>
