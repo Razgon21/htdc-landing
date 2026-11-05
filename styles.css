@@ -440,7 +440,7 @@ a { color: inherit; }
 .footer__mark {
   font: 600 clamp(5rem, 22vw, 22rem)/0.8 var(--serif);
   letter-spacing: 0.06em;
-  color: #1c2332;
+  color: #5b6476;
   margin-left: -0.04em;
 }
 .footer__row {
