@@ -15,6 +15,13 @@
 <a class="skip" href="#main">К содержанию</a>
 
 <canvas class="fog" aria-hidden="true"></canvas>
+<!-- Одна сфера на всю страницу: резкая у якорей, мягкий свет между ними -->
+<div class="sphere" aria-hidden="true">
+  <div class="sphere__soft"></div>
+  <div class="sphere__mid"></div>
+  <div class="sphere__sharp"></div>
+  <div class="sphere__sheet"></div>
+</div>
 
 <header class="nav">
   <a class="nav__mark" href="#top" aria-label="HTDC, в начало">HTDC</a>
@@ -29,7 +36,7 @@
 
 <main id="main">
 
-  <section class="hero" id="top" data-light="orb,1">
+  <section class="hero" id="top" data-light="0.74,0.40,1">
     <div class="hero__text">
       <h1 class="hero__title">На бумаге всё сходится</h1>
       <p class="hero__lead">Организационная диагностика для компаний на 50–300 человек. Находим, где работа расходится с тем, как она устроена, и проверяем причину трёхнедельным экспериментом с замером «до» и «после».</p>
@@ -38,7 +45,7 @@
         <a class="link" href="#formats">Пример управленческой инструкции</a>
       </div>
     </div>
-    <div class="hero__orb" aria-hidden="true"><div class="orb"></div></div>
+    <div class="hero__orb" data-anchor aria-hidden="true"></div>
   </section>
 
   <section class="situations" id="situations" aria-labelledby="situations-title" data-light="0.12,0.30,0.6">
@@ -120,10 +127,10 @@
     </ul>
   </section>
 
-  <section class="lens" id="lens" aria-labelledby="lens-title" data-light="orb,1.25">
+  <section class="lens" id="lens" aria-labelledby="lens-title" data-light="0.5,0.42,1.1">
     <h2 id="lens-title" class="h2 lens__title">Что именно мы смотрим</h2>
     <div class="lens__stage">
-      <div class="lens__orb" aria-hidden="true"><div class="orb"></div></div>
+      <div class="lens__orb" data-anchor aria-hidden="true"></div>
       <dl class="lens__grid">
         <div class="lens__q lens__q--tl"><dt>Решения</dt><dd>Кто на деле принимает решения и доводит их до конца, а кто только согласует.</dd></div>
         <div class="lens__q lens__q--tr"><dt>Внимание</dt><dd>На что уходит время руководителей и что остаётся без присмотра.</dd></div>
@@ -196,11 +203,11 @@
     </div>
   </section>
 
-  <section class="paper" id="example" aria-labelledby="example-title" data-light="orb,1">
-    <!-- Сцена: сфера растёт и заливает экран светом, из неё проявляется светлый лист -->
+  <section class="paper" id="example" aria-labelledby="example-title" data-light="0.5,0.5,0.9">
+    <!-- Сцена: та же сфера растёт и заливает экран светом, из неё проявляется светлый лист -->
     <div class="paper__scene" data-paper-scene>
       <div class="paper__stage">
-        <div class="paper__orb" aria-hidden="true"><div class="orb"></div></div>
+        <div class="paper__orb" data-anchor aria-hidden="true"></div>
         <div class="paper__head">
           <h2 id="example-title" class="h2">Ход мысли на примере</h2>
           <p class="paper__tag">Демонстрационный сценарий. Компания, ситуация и результат вымышлены, чтобы показать, как мы рассуждаем.</p>

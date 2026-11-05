@@ -131,15 +131,36 @@ a { color: inherit; }
   display: flex; flex-wrap: wrap; align-items: center; gap: 20px 32px;
 }
 
-/* Сфера: один источник света. Край резкий, ореол вокруг рисует canvas */
-.orb {
-  width: 100%;
-  aspect-ratio: 1;
-  border-radius: 50%;
+/* Сфера: один объект на всю страницу. Скрипт двигает и масштабирует её (только transform),
+   а резкость меняется перекрёстным появлением слоёв: резкий → полуразмытый → мягкий свет. */
+.sphere {
+  display: none;
+  position: fixed; left: 0; top: 0; z-index: 0;
+  width: 600px; height: 600px;
+  transform-origin: 0 0;
+  pointer-events: none;
+  will-change: transform;
+}
+.js .sphere { display: block; }
+.sphere > div { position: absolute; inset: 0; border-radius: 50%; will-change: opacity; }
+.sphere__sharp, .sphere__mid, html:not(.js) [data-anchor] {
   background: radial-gradient(circle at 36% 30%,
     #ffffff 0%, #f6faff 8%, #e1edf9 22%, #bcd2ea 44%,
     #8aa7cc 68%, #5b779f 88%, #46608a 100%);
 }
+html:not(.js) [data-anchor] { border-radius: 50%; }
+.sphere__mid { filter: blur(18px); opacity: 0; }
+.sphere__soft {
+  inset: -45%;
+  background: radial-gradient(circle,
+    rgba(244,249,255,0.95) 0%, rgba(214,230,248,0.7) 12%, rgba(160,188,226,0.32) 30%,
+    rgba(110,140,190,0.1) 50%, rgba(80,105,150,0) 70%);
+  opacity: 0;
+}
+.sphere__sheet { background: #dfe4eb; opacity: 0; }
+
+/* Якоря: места, где сфера становится крупной и резкой */
+[data-anchor] { aspect-ratio: 1; }
 .hero__orb { justify-self: center; width: min(38vw, 540px); }
 
 /* Ситуации: честные чекбоксы слева, разбор справа */
@@ -369,12 +390,9 @@ html:not(.js) .reading__empty { display: none; }
   display: block;
   position: absolute; left: 50%; top: 50%;
   width: 160px; height: 160px; margin: -80px 0 0 -80px;
-  border-radius: 50%;
-  background: var(--sheet);
   transform: scale(var(--s, 1));
-  will-change: transform;
 }
-.motion .paper__orb .orb { opacity: var(--o, 1); }
+.motion .paper__stage[data-filled] { background: var(--sheet); }
 .motion .paper__head {
   /* Свой фон: текст читается, даже если сфера ещё не закрыла центр */
   background: var(--sheet);
@@ -520,7 +538,8 @@ html:not(.js) .reading__empty { display: none; }
   .hero { grid-template-columns: 1fr; align-items: start; min-height: 0; gap: 48px; padding-top: 32px; }
   .hero__lead { margin-top: 24px; }
   .hero__actions { margin-top: 32px; }
-  .hero__orb { width: min(64vw, 360px); justify-self: end; }
+  /* Сфера над заголовком: при загрузке резкая в слоте, при скролле уходит вверх, не проходя под текстом */
+  .hero__orb { order: -1; width: min(50vw, 240px); justify-self: end; margin-bottom: -16px; }
 
   .situations__head, .not__head, .not__rows li, .process__head, .process__terms,
   .formats__grid, .faq, .contact { grid-template-columns: 1fr; }

@@ -22,13 +22,26 @@ const SAMPLE_URL = null;
   syncNav();
   addEventListener("scroll", syncNav, { passive: true });
 
-  /* ---------- Туман и свет ----------
-     Текстуры рендерятся один раз в offscreen canvas; в кадре только drawImage.
-     Canvas считается в половинном разрешении: туман размыт, разницы не видно. */
+  /* ---------- Туман, свет и сфера ----------
+     На странице одна сфера. У якорей ([data-anchor]) она крупная и резкая и стоит точно в слоте;
+     между ними уменьшается, размывается и уходит в туман мягким светом. Состояние считается
+     от положения прокрутки, поэтому обратный скролл проигрывает переход обратно.
+     Туман рендерится один раз в offscreen canvas; в кадре только drawImage, в половинном разрешении. */
   const canvas = document.querySelector(".fog");
   const ctx = canvas.getContext("2d", { alpha: false });
   const SCALE = 0.5;
   const BG = "#06080d";
+  const sphere = document.querySelector(".sphere");
+  const layers = {
+    soft: sphere.querySelector(".sphere__soft"),
+    mid: sphere.querySelector(".sphere__mid"),
+    sharp: sphere.querySelector(".sphere__sharp"),
+    sheet: sphere.querySelector(".sphere__sheet"),
+  };
+  const BASE = 600; // размер элемента сферы в CSS
+
+  const smooth = (a, b, v) => { const t = clamp((v - a) / (b - a)); return t * t * (3 - 2 * t); };
+  const mix = (a, b, t) => a + (b - a) * t;
 
   function sprite(size, stops) {
     const c = document.createElement("canvas");
@@ -47,16 +60,14 @@ const SAMPLE_URL = null;
     [0.45, "rgba(78,96,130,0.22)"],
     [1, "rgba(40,55,85,0)"],
   ]);
-  // Свет без сферы: мягкий источник в тумане
-  const LIGHT = sprite(512, [
-    [0, "rgba(255,255,255,1)"],
-    [0.035, "rgba(240,247,255,0.92)"],
-    [0.12, "rgba(200,222,245,0.42)"],
-    [0.3, "rgba(130,160,200,0.13)"],
-    [0.6, "rgba(80,105,145,0.04)"],
+  // Свечение тумана вокруг мягкого света
+  const GLOW = sprite(512, [
+    [0, "rgba(200,222,245,0.5)"],
+    [0.2, "rgba(150,178,215,0.2)"],
+    [0.5, "rgba(90,115,160,0.06)"],
     [1, "rgba(60,80,120,0)"],
   ]);
-  // Ореол вокруг сферы: яркий у края и быстро гаснет
+  // Ореол вокруг резкой сферы: ярко у края, быстро гаснет
   const HALO = sprite(512, [
     [0, "rgba(230,242,255,0.95)"],
     [0.3, "rgba(200,222,248,0.7)"],
@@ -97,15 +108,15 @@ const SAMPLE_URL = null;
     frame(performance.now(), true);
   }
 
-  // Свет ходит по истории страницы: data-light="x,y,сила" или "orb,сила" — тогда свет стоит за сферой секции
+  // Куда уходит мягкий свет в каждой секции: data-light="x,y,сила"
   const stops = [...document.querySelectorAll("[data-light]")].map((el) => {
-    const parts = el.dataset.light.split(",");
-    if (parts[0] === "orb") return { el, orb: el.querySelector(".orb"), k: Number(parts[1]) };
-    const [x, y, k] = parts.map(Number);
+    const [x, y, k] = el.dataset.light.split(",").map(Number);
     return { el, x, y, k };
   });
-  const light = { x: 0.7, y: 0.45, k: 1, size: 0, halo: 0, locked: false, stop: null };
+  const anchors = [...document.querySelectorAll("[data-anchor]")];
+  const soft = { x: 0.74, y: 0.4, k: 1, ready: false };
   const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+  const paper = { el: document.querySelector(".paper__orb"), fill: 0 };
 
   function pickStop() {
     const mid = innerHeight / 2;
@@ -114,6 +125,21 @@ const SAMPLE_URL = null;
       const r = s.el.getBoundingClientRect();
       const d = r.top <= mid && r.bottom >= mid ? 0 : Math.min(Math.abs(r.top - mid), Math.abs(r.bottom - mid));
       if (d < bestD) { bestD = d; best = s; }
+    }
+    return best;
+  }
+
+  // Ближайший якорь и насколько сфера «собрана» у него: 1 — слот у середины экрана.
+  // Диапазон широкий, чтобы переход растягивался почти на экран прокрутки.
+  function pickAnchor() {
+    const vh = innerHeight;
+    let best = null, bestE = 0;
+    for (const el of anchors) {
+      if (!el.offsetWidth) continue;
+      const r = el.getBoundingClientRect();
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      const e = 1 - smooth(vh * 0.14, vh * 0.85, Math.abs(cy - vh / 2));
+      if (e > bestE) { bestE = e; best = { el, cx, cy, d: r.width, e }; }
     }
     return best;
   }
@@ -127,48 +153,51 @@ const SAMPLE_URL = null;
   let last = 0;
   function frame(now, still) {
     const t = now * 0.001;
-    const s = pickStop();
+    const vw = innerWidth, vh = innerHeight;
     const drift = still ? 0 : 1;
-    if (s !== light.stop) { light.stop = s; light.locked = false; }
 
-    let tx, ty, tsize, thalo;
-    const orbRect = s.orb && s.orb.getBoundingClientRect();
-    if (orbRect && orbRect.width > 0) {
-      // Сфера статична: свет стоит ровно за ней, без дрейфа и параллакса
-      const r = orbRect;
-      tx = (r.left + r.width / 2) / innerWidth;
-      ty = (r.top + r.height / 2) / innerHeight;
-      tsize = Math.min(r.width * 3.1, Math.max(W, H) * 2.2) * SCALE;
-      thalo = 1;
-    } else {
-      tx = (s.x ?? 0.5) + Math.sin(t * 0.11) * 0.09 * drift;
-      ty = (s.y ?? 0.4) + Math.cos(t * 0.083) * 0.07 * drift;
-      tsize = Math.min(W, H) * SCALE * (0.9 + 0.5 * s.k);
-      thalo = 0;
-    }
-
-    // Переход между секциями плавный; у сферы свет «прилипает» и дальше идёт за ней без отставания
-    const ease = still || light.locked ? 1 : 0.04;
-    light.x += (tx - light.x) * ease;
-    light.y += (ty - light.y) * ease;
-    light.k += (s.k - light.k) * ease;
-    light.size += (tsize - light.size) * (still ? 1 : 0.06);
-    light.halo += (thalo - light.halo) * (still ? 1 : 0.05);
-    if (orbRect && orbRect.width > 0 && Math.hypot(tx - light.x, ty - light.y) < 0.004) light.locked = true;
+    // Мягкий свет плывёт к точке текущей секции
+    const s = pickStop();
+    const sx = s.x + Math.sin(t * 0.11) * 0.06 * drift;
+    const sy = s.y + Math.cos(t * 0.083) * 0.05 * drift;
+    const ease = still || !soft.ready ? 1 : 0.03;
+    soft.x += (sx - soft.x) * ease;
+    soft.y += (sy - soft.y) * ease;
+    soft.k += (s.k - soft.k) * ease;
+    soft.ready = true;
     pointer.x += (pointer.tx - pointer.x) * 0.03;
     pointer.y += (pointer.ty - pointer.y) * 0.03;
 
+    // Одно состояние сферы: смесь мягкого света и якоря
+    const a = pickAnchor();
+    const e = a ? a.e : 0;
+    const softD = Math.min(vw, vh) * 0.13 * (0.8 + 0.3 * soft.k);
+    const px = (soft.x + pointer.x * 0.03) * vw, py = (soft.y + pointer.y * 0.03) * vh;
+    // Положение держится за слотом дольше, чем резкость: сфера сначала уезжает вместе с ним, потом растворяется
+    const ep = smooth(0, 0.6, e);
+    const cx = a ? mix(px, a.cx, ep) : px;
+    const cy = a ? mix(py, a.cy, ep) : py;
+    const d = a ? mix(softD, a.d, e) : softD;
+
+    const k = d / BASE;
+    sphere.style.transform = `translate3d(${(cx - d / 2).toFixed(1)}px, ${(cy - d / 2).toFixed(1)}px, 0) scale(${k.toFixed(4)})`;
+    // Резкий слой лежит сверху, под ним полуразмытый, ещё ниже мягкий свет
+    layers.sharp.style.opacity = smooth(0.55, 0.95, e).toFixed(3);
+    layers.mid.style.opacity = (smooth(0.1, 0.45, e) * (1 - smooth(0.85, 1, e))).toFixed(3);
+    // На узком экране текст идёт во всю ширину, поэтому мягкий свет тише: под ним должен читаться текст
+    const softMax = vw < 860 ? 0.36 : clamp(0.55 + 0.4 * soft.k);
+    layers.soft.style.opacity = ((1 - smooth(0.25, 0.7, e)) * softMax).toFixed(3);
+    const sheet = a && a.el === paper.el ? paper.fill * e : 0;
+    layers.sheet.style.opacity = sheet.toFixed(3);
+
+    // Туман: у резкой сферы расходится к краям, у мягкого света гуще рядом с ним
     const cw = canvas.width, ch = canvas.height, big = Math.max(cw, ch);
     ctx.globalCompositeOperation = "source-over";
     ctx.globalAlpha = 1;
     ctx.fillStyle = BG;
     ctx.fillRect(0, 0, cw, ch);
+    const lx = cx * SCALE, ly = cy * SCALE;
 
-    const par = 1 - light.halo; // у сферы параллакса нет
-    const lx = (light.x + pointer.x * 0.02 * par) * cw;
-    const ly = (light.y + pointer.y * 0.02 * par) * ch;
-
-    // Туман; у сферы расходится к краям, у мягкого света — гуще рядом с ним
     const dt = still ? 0 : Math.min(now - last, 50);
     for (const p of particles) {
       p.phase += p.speed * dt * 6;
@@ -176,64 +205,63 @@ const SAMPLE_URL = null;
       p.y += Math.cos(p.phase * 0.7) * p.speed * 0.6 * dt;
       if (p.x < -0.4) p.x = 1.4; else if (p.x > 1.4) p.x = -0.4;
       const size = p.size * big;
-      const px = p.x * cw, py = p.y * ch;
-      const dx = (px - lx) / big, dy = (py - ly) / big;
+      const fx = p.x * cw, fy = p.y * ch;
+      const dx = (fx - lx) / big, dy = (fy - ly) / big;
       const near = Math.max(0, 1 - Math.sqrt(dx * dx + dy * dy) * 1.6);
-      const boost = near * 1.6 * light.k * (1 - light.halo * 1.3);
+      const boost = near * 1.6 * soft.k * (1 - e * 1.3);
       ctx.globalAlpha = clamp(p.alpha * (0.6 + boost), 0.03, 1);
-      ctx.drawImage(FOG, px - size / 2, py - size / 2, size, size);
+      ctx.drawImage(FOG, fx - size / 2, fy - size / 2, size, size);
     }
 
+    // Свет вокруг сферы — того же центра и размера, поэтому никогда не расходится с ней
     ctx.globalCompositeOperation = "lighter";
-    const ls = light.size;
-    if (light.halo < 1) {
-      ctx.globalAlpha = 0.55 * light.k * (1 - light.halo);
-      ctx.drawImage(LIGHT, lx - ls / 2, ly - ls / 2, ls, ls);
+    if (e < 1) {
+      const gs = Math.min(cw, ch) * (1.1 + 0.4 * soft.k);
+      ctx.globalAlpha = 0.6 * soft.k * (1 - e);
+      ctx.drawImage(GLOW, lx - gs / 2, ly - gs / 2, gs, gs);
     }
-    if (light.halo > 0) {
-      ctx.globalAlpha = 0.6 * Math.min(light.k, 1.2) * light.halo;
-      ctx.drawImage(HALO, lx - ls / 2, ly - ls / 2, ls, ls);
+    if (e > 0 && sheet < 1) {
+      const hs = Math.min(d * 3.1, Math.max(vw, vh) * 2.2) * SCALE;
+      ctx.globalAlpha = 0.6 * e * (1 - sheet);
+      ctx.drawImage(HALO, lx - hs / 2, ly - hs / 2, hs, hs);
     }
 
     last = now;
     if (!still && motion) requestAnimationFrame(frame);
   }
 
-  addEventListener("resize", resize, { passive: true });
+  /* ---------- Сцена: сфера заливает экран светом, из неё проявляется лист ---------- */
+  const scene = document.querySelector("[data-paper-scene]");
+  const updateScene = () => {
+    if (!scene || !motion) return;
+    const stage = scene.querySelector(".paper__stage");
+    const head = scene.querySelector(".paper__head");
+    const r = scene.getBoundingClientRect();
+    const vh = innerHeight;
+    const p = clamp(-r.top / Math.max(1, r.height - vh));
+    const cover = Math.hypot(innerWidth, vh) / 160 * 1.06;
+    const grow = clamp(p / 0.62);
+    paper.el.style.setProperty("--s", (1 + (cover - 1) * grow ** 2.4).toFixed(3));
+    paper.fill = clamp((p - 0.12) / 0.34);
+    head.style.setProperty("--h", clamp((p - 0.6) / 0.24).toFixed(3));
+    // Когда свет залил экран, лист держит фон сам — сфера может уходить
+    stage.toggleAttribute("data-filled", p > 0.97);
+  };
+
+  addEventListener("resize", () => { resize(); updateScene(); }, { passive: true });
+  updateScene();
   resize();
   if (motion) {
+    addEventListener("scroll", updateScene, { passive: true });
     requestAnimationFrame((n) => { last = n; frame(n); });
   } else {
-    // Без движения: один кадр на каждое изменение прокрутки
+    // Без движения: сфера просто стоит у якорей, кадр пересчитывается при прокрутке
     let queued = false;
     addEventListener("scroll", () => {
       if (queued) return;
       queued = true;
       requestAnimationFrame(() => { queued = false; frame(performance.now(), true); });
     }, { passive: true });
-  }
-
-  /* ---------- Сцена: сфера заливает экран светом, из неё проявляется лист ---------- */
-  const scene = document.querySelector("[data-paper-scene]");
-  if (scene && motion) {
-    const orb = scene.querySelector(".paper__orb");
-    const head = scene.querySelector(".paper__head");
-    let queued = false;
-    const update = () => {
-      queued = false;
-      const r = scene.getBoundingClientRect();
-      const vh = innerHeight;
-      const p = clamp(-r.top / Math.max(1, r.height - vh));
-      const cover = Math.hypot(innerWidth, vh) / 160 * 1.06;
-      const grow = clamp(p / 0.62);
-      orb.style.setProperty("--s", (1 + (cover - 1) * grow ** 2.4).toFixed(3));
-      orb.style.setProperty("--o", (1 - clamp((p - 0.12) / 0.34)).toFixed(3));
-      head.style.setProperty("--h", clamp((p - 0.6) / 0.24).toFixed(3));
-    };
-    const request = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
-    addEventListener("scroll", request, { passive: true });
-    addEventListener("resize", request, { passive: true });
-    update();
   }
 
   /* ---------- Ситуации ---------- */
