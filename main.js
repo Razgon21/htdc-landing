@@ -1,9 +1,18 @@
-/* HTDC — туман и свет на фоне, карта разрывов, ситуации. Без зависимостей. */
+/* HTDC — туман и свет на фоне, карта разрывов, ситуации, заявка. Без зависимостей. */
+
+// Куда уходит заявка. Пока null — отправка имитируется.
+const FORM_ENDPOINT = null;
+// Файл с примером управленческой инструкции. Пока null — кнопка ведёт к форме.
+const SAMPLE_URL = null;
+
 (() => {
   "use strict";
 
-  document.documentElement.classList.add("js");
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+  document.documentElement.classList.add("js");
+  if (!reduceMotion.matches && "IntersectionObserver" in window) {
+    document.documentElement.classList.add("motion");
+  }
 
   /* ---------- Навигация: прозрачная только над первым экраном ---------- */
   const nav = document.querySelector(".nav");
@@ -223,8 +232,111 @@
 
     // Выбор уезжает в форму заявки
     summary.querySelector("[data-discuss]").addEventListener("click", () => {
-      window.htdcSituations = [...chosen];
-      document.dispatchEvent(new CustomEvent("htdc:situations", { detail: [...chosen] }));
+      const message = document.getElementById("f-message");
+      if (message && chosen.size && !message.value.trim()) {
+        message.value = "Узнаём у себя:\n" + [...chosen].map((s) => "— " + s).join("\n");
+      }
+    });
+  }
+
+  /* ---------- Появление частей секций ---------- */
+  if (document.documentElement.classList.contains("motion")) {
+    const groups = document.querySelectorAll(
+      ".hero__text, .situations__intro, .not__head, .not__list, .lens, .process__head, .steps, .process__terms, " +
+      ".paper__head, .case, .formats > .h2, .formats__grid, .faq > .h2, .faq__list, .contact__intro, .form"
+    );
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        e.target.classList.add("is-in");
+        io.unobserve(e.target);
+      }
+    }, { rootMargin: "0px 0px -12% 0px" });
+    for (const g of groups) {
+      // Одиночный заголовок появляется сам, у группы — каждый ребёнок по очереди
+      if (g.matches(".h2")) {
+        g.setAttribute("data-reveal-self", "");
+      } else {
+        g.setAttribute("data-reveal", "");
+        [...g.children].forEach((c, i) => c.style.setProperty("--i", Math.min(i, 6)));
+      }
+      io.observe(g);
+    }
+  }
+
+  /* ---------- Кнопки форматов выбирают формат в заявке ---------- */
+  const sample = document.querySelector("[data-sample]");
+  if (sample && SAMPLE_URL) {
+    sample.href = SAMPLE_URL;
+    sample.setAttribute("download", "");
+    sample.textContent = "Скачать пример инструкции";
+    delete sample.dataset.format;
+  }
+  document.querySelectorAll("[data-format]").forEach((a) => {
+    a.addEventListener("click", () => {
+      const radio = document.querySelector(`.form input[name="format"][value="${a.dataset.format}"]`);
+      if (radio) radio.checked = true;
+    });
+  });
+
+  /* ---------- Заявка ---------- */
+  const form = document.querySelector("[data-form]");
+  if (form) {
+    const status = form.querySelector(".form__status");
+    const checks = {
+      name: (v) => v.trim().length >= 2 || "Напишите, как к вам обращаться.",
+      company: (v) => v.trim().length >= 2 || "Напишите название компании.",
+      // Принимаем любой привычный формат: +7 (999) 123-45-67, 89991234567, 8 999 123 45 67
+      phone: (v) => { const d = v.replace(/\D/g, ""); return (d.length >= 10 && d.length <= 15) || "Проверьте номер: в нём должно быть не меньше 10 цифр."; },
+      consent: (_, el) => el.checked || "Без согласия мы не можем принять заявку.",
+    };
+
+    function check(el) {
+      const rule = checks[el.name];
+      if (!rule) return true;
+      const res = rule(el.value, el);
+      const err = document.getElementById(el.getAttribute("aria-describedby"));
+      const ok = res === true;
+      el.setAttribute("aria-invalid", String(!ok));
+      if (err) { err.hidden = ok; err.textContent = ok ? "" : res; }
+      return ok;
+    }
+
+    form.addEventListener("change", (e) => { if (e.target.getAttribute("aria-invalid")) check(e.target); });
+    form.addEventListener("input", (e) => { if (e.target.getAttribute("aria-invalid") === "true") check(e.target); });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fields = [...form.elements].filter((el) => checks[el.name]);
+      const bad = fields.filter((el) => !check(el));
+      if (bad.length) { bad[0].focus(); return; }
+
+      const submit = form.querySelector(".form__submit");
+      submit.disabled = true;
+      status.textContent = "Отправляем…";
+      const data = Object.fromEntries(new FormData(form));
+      try {
+        if (FORM_ENDPOINT) {
+          const res = await fetch(FORM_ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+          if (!res.ok) throw new Error(res.status);
+        } else {
+          await new Promise((r) => setTimeout(r, 900)); // имитация отправки
+        }
+        const done = document.createElement("div");
+        done.className = "form__done";
+        done.tabIndex = -1;
+        done.innerHTML = '<h3 class="h3">Спасибо, заявка у нас</h3>' +
+          '<p>Свяжемся с вами <span class="draft">в течение рабочего дня</span>, чтобы договориться о встрече.</p>';
+        form.replaceWith(done);
+        done.focus();
+      } catch {
+        submit.disabled = false;
+        status.textContent = "Не получилось отправить. Попробуйте ещё раз или напишите нам на почту.";
+      }
     });
   }
 })();
