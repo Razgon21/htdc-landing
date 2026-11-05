@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTDC — организационная диагностика</title>
+<meta name="description" content="Находим, где работа в компании расходится с тем, как она устроена на бумаге, и проверяем причину коротким экспериментом с замером «до» и «после».">
+<meta name="theme-color" content="#06080D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500&display=swap&subset=cyrillic" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#main">К содержанию</a>
+
+<canvas class="fog" aria-hidden="true"></canvas>
+
+<header class="nav">
+  <a class="nav__mark" href="#top" aria-label="HTDC, в начало">HTDC</a>
+  <nav class="nav__links" aria-label="Разделы">
+    <a href="#situations">Ситуации</a>
+    <a href="#process">Как проходит</a>
+    <a href="#formats">Форматы</a>
+    <a href="#faq">Вопросы</a>
+  </nav>
+  <a class="btn btn--small" href="#contact">Обсудить диагностику</a>
+</header>
+
+<main id="main">
+
+  <section class="hero" id="top" data-light="0.70,0.46,1">
+    <div class="hero__text">
+      <h1 class="hero__title">На бумаге всё сходится</h1>
+      <p class="hero__lead">Организационная диагностика для компаний на 50–300 человек. Находим, где работа расходится с тем, как она устроена, и проверяем причину трёхнедельным экспериментом с замером «до» и «после».</p>
+      <div class="hero__actions">
+        <a class="btn" href="#contact">Обсудить диагностику</a>
+        <a class="link" href="#formats">Пример управленческой инструкции</a>
+      </div>
+    </div>
+
+    <figure class="map" aria-labelledby="map-caption">
+      <div class="map__stack" role="img" aria-label="Демонстрационная схема: оргструктура компании и реальные связи, которые идут в обход неё">
+      <!-- Слой «на бумаге»: формальная оргструктура -->
+      <svg class="map__svg map__paper" viewBox="0 0 480 390" aria-hidden="true">
+        <path d="M240 60 V95 M80 95 H400 M80 95 V130 M240 95 V130 M400 95 V130
+                 M80 170 V250 M240 170 V210 M190 210 H298 M190 210 V250 M298 210 V250 M400 170 V250"/>
+        <g class="map__nodes">
+          <rect x="170" y="20" width="140" height="40"/>
+          <rect x="20" y="130" width="120" height="40"/>
+          <rect x="170" y="130" width="140" height="40"/>
+          <rect x="340" y="130" width="120" height="40"/>
+          <rect x="30" y="250" width="100" height="40"/>
+          <rect x="145" y="250" width="90" height="40"/>
+          <rect x="245" y="250" width="106" height="40"/>
+          <rect x="360" y="250" width="80" height="40"/>
+        </g>
+        <g class="map__labels">
+          <text x="240" y="45">Собственник</text>
+          <text x="80" y="155">Коммерция</text>
+          <text x="240" y="155">Производство</text>
+          <text x="400" y="155">Финансы</text>
+          <text x="80" y="275">Продажи</text>
+          <text x="190" y="275">Цех</text>
+          <text x="298" y="275">Снабжение</text>
+          <text x="400" y="275">Учёт</text>
+        </g>
+      </svg>
+      <!-- Слой «на самом деле»: проявляется светом -->
+      <svg class="map__svg map__real" viewBox="0 0 480 390" aria-hidden="true">
+        <path class="map__flow" d="M60 250 C 10 190, 30 90, 170 50"/>
+        <path class="map__flow" d="M320 250 C 360 200, 340 80, 300 60"/>
+        <path class="map__flow map__flow--loop" d="M190 290 C 190 340, 80 340, 80 290"/>
+        <path class="map__cut" d="M250 95 H400"/>
+        <ellipse class="map__knot" cx="240" cy="40" rx="86" ry="34"/>
+        <g class="map__notes">
+          <text x="8" y="24" text-anchor="start">напрямую<tspan x="8" dy="19">к собственнику</tspan></text>
+          <text x="135" y="356" text-anchor="middle">цех и продажи<tspan x="135" dy="19">договариваются сами</tspan></text>
+          <text x="472" y="62" text-anchor="end">связь есть<tspan x="472" dy="19">только на схеме</tspan></text>
+        </g>
+      </svg>
+      </div>
+      <figcaption id="map-caption" class="map__caption">Серым — как устроено на бумаге. Светом — как идёт на самом деле. Демонстрационная схема.</figcaption>
+    </figure>
+  </section>
+
+  <section class="situations" id="situations" aria-labelledby="situations-title" data-light="0.22,0.40,0.7">
+    <div class="situations__intro">
+      <h2 id="situations-title" class="h2">Что из этого происходит у вас?</h2>
+      <p>Отметьте ситуации, которые узнаёте. Под каждой — где обычно прячется причина и что мы проверили бы первым делом.</p>
+      <p class="situations__note">Это не «плохие сотрудники». Чаще всего люди ведут себя разумно внутри правил, которые давно перестали подходить компании.</p>
+      <div class="situations__summary" aria-live="polite">
+        <p class="situations__count" data-count>Пока ничего не отмечено.</p>
+        <a class="btn" href="#contact" data-discuss>Обсудить эти ситуации</a>
+      </div>
+    </div>
+
+    <ol class="situations__list" role="list" data-situations>
+      <li class="sit">
+        <button class="sit__toggle" type="button" aria-pressed="false" aria-expanded="false" aria-controls="sit-1">Важное знают внизу, но до вас это не доходит</button>
+        <div class="sit__reading" id="sit-1">
+          <p><strong>Где обычно причина.</strong> Нести плохие новости наверх невыгодно или некому: тот, кто сообщил о проблеме, получает её в нагрузку.</p>
+          <p><strong>Что проверим.</strong> По каким путям на самом деле идёт информация и на каком шаге застревает.</p>
+        </div>
+      </li>
+      <li class="sit">
+        <button class="sit__toggle" type="button" aria-pressed="false" aria-expanded="false" aria-controls="sit-2">На совещании все согласны, а делают по-старому</button>
+        <div class="sit__reading" id="sit-2">
+          <p><strong>Где обычно причина.</strong> Согласие на встрече ничего не стоит, а за отход от привычного порядка можно поплатиться.</p>
+          <p><strong>Что проверим.</strong> Что конкретный человек теряет, если сделает по-новому, и кто это замечает.</p>
+        </div>
+      </li>
+      <li class="sit">
+        <button class="sit__toggle" type="button" aria-pressed="false" aria-expanded="false" aria-controls="sit-3">Отделы выполняют свои планы, а компания в целом теряет</button>
+        <div class="sit__reading" id="sit-3">
+          <p><strong>Где обычно причина.</strong> Цели и премии настроены так, что выигрыш одного отдела оплачивает соседний.</p>
+          <p><strong>Что проверим.</strong> Как показатели отделов связаны между собой и где они тянут в разные стороны.</p>
+        </div>
+      </li>
+      <li class="sit">
+        <button class="sit__toggle" type="button" aria-pressed="false" aria-expanded="false" aria-controls="sit-4">Одни и те же проблемы возвращаются, хотя регламенты написаны</button>
+        <div class="sit__reading" id="sit-4">
+          <p><strong>Где обычно причина.</strong> Регламент описывает, как должно быть, а в работе давно есть обходной путь, и он удобнее.</p>
+          <p><strong>Что проверим.</strong> Каким путём работа идёт на деле и почему люди выбирают именно его.</p>
+        </div>
+      </li>
+      <li class="sit">
+        <button class="sit__toggle" type="button" aria-pressed="false" aria-expanded="false" aria-controls="sit-5">Без вас ничего не решается</button>
+        <div class="sit__reading" id="sit-5">
+          <p><strong>Где обычно причина.</strong> Полномочия выданы на бумаге, но решить самому рискованнее, чем дождаться вас.</p>
+          <p><strong>Что проверим.</strong> Какие решения сотрудники могли бы принимать сами и что их останавливает.</p>
+        </div>
+      </li>
+      <li class="sit">
+        <button class="sit__toggle" type="button" aria-pressed="false" aria-expanded="false" aria-controls="sit-6">Сильные люди уходят, а причину называют личной</button>
+        <div class="sit__reading" id="sit-6">
+          <p><strong>Где обычно причина.</strong> Лучшие первыми упираются в правила, которые мешают сделать работу хорошо.</p>
+          <p><strong>Что проверим.</strong> Что именно мешает тем, кто работает лучше всех, и сколько сил уходит на обход.</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <section class="next" id="contact" aria-labelledby="next-title">
+    <h2 id="next-title" class="h2">Дальше на странице</h2>
+    <p>Это эскиз направления: первый экран и живой элемент. Остальные секции — как проходит диагностика, демонстрационный разбор, форматы, вопросы и заявка — собираются после согласования.</p>
+  </section>
+
+</main>
+
+<script src="main.js" defer></script>
+</body>
+</html>

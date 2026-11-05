@@ -1,0 +1,254 @@
+/* HTDC — лендинг. Токены → основа → секции. */
+
+:root {
+  --bg: #06080d;
+  --bg-2: #0c1018;
+  --ink: #e8eaee;
+  --ink-2: #a9b0bc;
+  --paper: #4a5262;
+  --light: #d6e6f5;
+  --on-light: #06080d;
+
+  --serif: "Cormorant Garamond", "Times New Roman", serif;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --step-display: clamp(3rem, 1.9rem + 4.4vw, 6rem);
+  --step-h2: clamp(2rem, 1.4rem + 2.6vw, 3.75rem);
+  --step-lead: clamp(1.125rem, 1rem + 0.45vw, 1.375rem);
+  --step-body: 1.0625rem;
+  --step-small: 0.9375rem;
+
+  --margin: clamp(16px, 4vw, 56px);
+  --section-gap: clamp(112px, 14vw, 200px);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: 88px; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 var(--step-body)/1.6 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3, p, ol, ul, figure { margin: 0; }
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; }
+::selection { background: var(--light); color: var(--on-light); }
+:focus-visible { outline: 2px solid var(--light); outline-offset: 4px; }
+
+.skip {
+  position: absolute; left: var(--margin); top: -100px; z-index: 50;
+  background: var(--light); color: var(--on-light); padding: 10px 18px; border-radius: 40px;
+  text-decoration: none;
+}
+.skip:focus { top: 12px; }
+
+/* Фон: туман и свет, canvas за всем содержимым */
+.fog {
+  position: fixed; inset: 0; z-index: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+.nav, main { position: relative; z-index: 1; }
+
+/* Кнопки и ссылки */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 52px; padding: 0 28px;
+  border-radius: 40px;
+  background: var(--light); color: var(--on-light);
+  font: 500 1rem/1 var(--sans);
+  text-decoration: none;
+  transition: transform 0.4s var(--ease), background-color 0.4s var(--ease);
+}
+.btn:hover { background: #fff; }
+.btn:active { transform: scale(0.97); }
+.btn--small { min-height: 44px; padding: 0 22px; font-size: 0.9375rem; }
+
+.link {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--ink-2);
+  text-underline-offset: 6px;
+  text-decoration-thickness: 1px;
+  transition: text-decoration-color 0.4s var(--ease), text-underline-offset 0.4s var(--ease);
+}
+.link:hover { text-decoration-color: var(--light); text-underline-offset: 9px; }
+
+.h2 {
+  font: 500 var(--step-h2)/1.02 var(--serif);
+  letter-spacing: -0.015em;
+  max-width: 16ch;
+}
+
+/* Навигация: простая полоса, без подложки */
+.nav {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  padding: 20px var(--margin);
+  background: var(--bg);
+  transition: background-color 0.6s var(--ease);
+}
+.nav[data-top] { background: transparent; }
+.nav__mark {
+  font: 600 1.5rem/1 var(--serif);
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.32em;
+  text-decoration: none;
+}
+.nav__links { display: flex; gap: 32px; margin-left: auto; }
+.nav__links a {
+  color: var(--ink-2); text-decoration: none; font-size: var(--step-small);
+  transition: color 0.4s var(--ease);
+}
+.nav__links a:hover { color: var(--ink); }
+
+/* Первый экран */
+.hero {
+  min-height: calc(100svh - 84px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(24px, 4vw, 64px);
+  padding: clamp(24px, 4vw, 48px) var(--margin) clamp(48px, 6vw, 96px);
+}
+.hero__title {
+  font: 500 var(--step-display)/0.95 var(--serif);
+  letter-spacing: -0.03em;
+  max-width: 11ch;
+  text-wrap: balance;
+}
+.hero__lead {
+  margin-top: 36px;
+  max-width: 34rem;
+  font-size: var(--step-lead);
+  line-height: 1.5;
+}
+.hero__actions {
+  margin-top: 44px;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 20px 32px;
+}
+
+/* Карта разрывов */
+.map { min-width: 0; max-width: 620px; justify-self: end; width: 100%; }
+.map__stack { position: relative; aspect-ratio: 480 / 390; }
+.map__svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+
+.map__paper path { fill: none; stroke: var(--paper); stroke-width: 1.25; }
+.map__nodes rect { fill: var(--bg-2); stroke: var(--paper); stroke-width: 1.25; }
+.map__labels text {
+  fill: var(--ink-2);
+  font: 400 16px var(--sans);
+  text-anchor: middle;
+}
+
+.map__real {
+  --mx: 50%; --my: 45%; --r: 42%;
+  -webkit-mask-image: radial-gradient(circle var(--r) at var(--mx) var(--my), #000 25%, transparent 100%);
+          mask-image: radial-gradient(circle var(--r) at var(--mx) var(--my), #000 25%, transparent 100%);
+}
+.map__flow { fill: none; stroke: var(--light); stroke-width: 2.25; stroke-linecap: round; }
+.map__flow--loop { stroke-dasharray: 2 7; }
+.map__cut { fill: none; stroke: var(--light); stroke-width: 2; stroke-dasharray: 10 10; opacity: 0.8; }
+.map__knot { fill: none; stroke: var(--light); stroke-width: 1.5; opacity: 0.85; }
+.map__notes text { fill: var(--light); font: 500 16px var(--sans); }
+
+.map__caption {
+  margin-top: 20px;
+  color: var(--ink-2);
+  font-size: var(--step-small);
+  max-width: 36rem;
+}
+
+/* Ситуации — живой элемент */
+.situations {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(32px, 5vw, 96px);
+  padding: var(--section-gap) var(--margin) 0;
+  align-items: start;
+}
+.situations__intro { position: sticky; top: 120px; }
+.situations__intro > p { margin-top: 28px; max-width: 30rem; }
+.situations__note { color: var(--ink-2); }
+.situations__summary { margin-top: 44px; }
+.situations__count { margin-bottom: 18px; color: var(--ink-2); font-size: var(--step-small); }
+
+.situations__list { list-style: none; padding: 0; display: grid; gap: 8px; }
+.sit { background: var(--bg-2); transition: background-color 0.5s var(--ease); }
+.sit[data-on] { background: #121826; }
+.sit__toggle {
+  width: 100%;
+  display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 24px;
+  padding: 26px 28px;
+  background: none; border: 0; color: var(--ink); text-align: left; cursor: pointer;
+  font: 500 clamp(1.375rem, 1.1rem + 0.9vw, 1.875rem)/1.2 var(--serif);
+}
+.sit__toggle::after {
+  content: "";
+  width: 22px; height: 22px; flex: none;
+  border-radius: 50%;
+  background: var(--paper);
+  transition: background-color 0.4s var(--ease), transform 0.4s var(--ease);
+}
+.sit__toggle:hover::after { background: var(--ink-2); }
+.sit__toggle[aria-pressed="true"]::after { background: var(--light); transform: scale(1.1); }
+.sit__toggle:active::after { transform: scale(0.85); }
+.sit__toggle:focus-visible { outline-offset: -4px; }
+
+.sit__reading {
+  display: grid; gap: 12px;
+  padding: 0 28px 28px;
+  max-width: 44rem;
+}
+.sit__reading strong { font-weight: 500; color: var(--light); }
+.js .sit__reading { display: none; }
+.js .sit[data-on] .sit__reading { display: grid; animation: reveal 0.7s var(--ease); }
+
+@keyframes reveal { from { opacity: 0; transform: translateY(-8px); } }
+
+.next { padding: var(--section-gap) var(--margin); max-width: 56rem; }
+.next p { margin-top: 28px; color: var(--ink-2); max-width: 40rem; }
+
+/* Телефон: своя композиция */
+@media (max-width: 1100px) {
+  .nav__links { display: none; }
+}
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr; align-items: start; min-height: 0; gap: 40px; padding-top: 32px; }
+  .hero__lead { margin-top: 24px; }
+  .hero__actions { margin-top: 32px; }
+  .map { justify-self: stretch; max-width: none; }
+  .situations { grid-template-columns: 1fr; }
+  .situations__intro { position: static; }
+  /* На телефоне итог выбора — плашка внизу экрана, пока секция на виду */
+  .situations__summary {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
+    margin: 0;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 12px var(--margin) calc(12px + env(safe-area-inset-bottom));
+    background: var(--bg-2);
+    transform: translateY(110%);
+    visibility: hidden;
+    transition: transform 0.5s var(--ease), visibility 0s linear 0.5s;
+  }
+  .situations__summary[data-has][data-visible] { transform: none; visibility: visible; transition-delay: 0s; }
+  .situations__count { margin: 0; }
+  .situations__summary .btn { min-height: 48px; padding: 0 20px; flex: none; }
+}
+@media (max-width: 520px) {
+  .nav { padding-block: 14px; }
+  .nav__mark { font-size: 1.3rem; }
+  .btn--small { padding: 0 18px; font-size: 0.875rem; }
+  .hero__actions .btn { width: 100%; }
+  .sit__toggle { padding: 22px 20px; gap: 16px; }
+  .sit__reading { padding: 0 20px 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
