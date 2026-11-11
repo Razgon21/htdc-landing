@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V7 PLASMA · Куда уходит половина прибыли</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  @page { size: A4; margin: 15mm; }
+  body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background: #FFFFFF;
+    color: #1A1A1A;
+    font-weight: 400;
+    line-height: 1.6;
+    font-size: 11px;
+  }
+  .page {
+    max-width: 800px;
+    margin: 0 auto 40px;
+    padding: 30px 24px;
+    page-break-after: always;
+    background: #FFFFFF;
+    min-height: 250mm;
+  }
+  .page:last-child { page-break-after: auto; }
+  .header {
+    border-bottom: 1px solid #D4AF37;
+    padding-bottom: 14px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .logo {
+    font-family: Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #B8941F;
+    font-weight: 600;
+  }
+  .page-num {
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: #999;
+  }
+  .title-page { text-align: center; padding-top: 40px; }
+  .title-page h1 {
+    font-size: 34px;
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 24px;
+    color: #1A1A1A;
+  }
+  .title-page h1 em {
+    color: #B8941F;
+    font-style: normal;
+    font-weight: 600;
+    display: block;
+    margin-top: 6px;
+  }
+  .title-page .subtitle {
+    font-size: 15px;
+    color: #555;
+    font-style: italic;
+    max-width: 580px;
+    margin: 0 auto 40px;
+    line-height: 1.65;
+  }
+  .title-visual {
+    width: 240px;
+    height: 240px;
+    margin: 0 auto 40px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 50%, #FEF0B0 0%, #F8D060 30%, #E88020 60%, #8B1A1A 85%, #1A1A1A 100%);
+    box-shadow: 0 0 80px rgba(212, 175, 55, 0.3);
+    position: relative;
+  }
+  .title-visual::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #FEF0B0 0%, #F8D060 50%, transparent 100%);
+  }
+  .title-footer {
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #888;
+    margin-top: 50px;
+  }
+  .title-footer .tagline {
+    color: #B8941F;
+    margin-top: 10px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  h2 {
+    font-size: 23px;
+    font-weight: 400;
+    color: #1A1A1A;
+    margin-bottom: 8px;
+    line-height: 1.25;
+  }
+  h2 .num {
+    font-family: Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: #B8941F;
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1A1A1A;
+    margin: 20px 0 10px;
+    font-family: Arial, sans-serif;
+  }
+  p {
+    font-size: 11.5px;
+    color: #333;
+    margin-bottom: 12px;
+    line-height: 1.65;
+  }
+  p.lead {
+    font-size: 13px;
+    color: #555;
+    font-style: italic;
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  strong { color: #1A1A1A; font-weight: 600; }
+  em { color: #B8941F; font-style: normal; font-weight: 600; }
+  .mockup {
+    background: #0D0D0F;
+    border-radius: 4px;
+    padding: 20px;
+    margin: 18px 0;
+    position: relative;
+    color: #E8E5DF;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+  }
+  .mockup .mock-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #D4AF37;
+    border-bottom: 1px solid rgba(212,175,55,0.2);
+    padding-bottom: 8px;
+    margin-bottom: 14px;
+  }
+  .mockup .mock-header .right { color: #8A8A8A; }
+  .mockup .mock-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .mockup .mock-metric {
+    background: rgba(20,20,24,0.6);
+    border: 1px solid rgba(212,175,55,0.15);
+    padding: 10px 8px;
+    border-radius: 2px;
+    text-align: center;
+  }
+  .mockup .mock-metric .label {
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #8A8A8A;
+    margin-bottom: 6px;
+  }
+  .mockup .mock-metric .value {
+    font-size: 20px;
+    color: #E8E5DF;
+    font-weight: 300;
+  }
+  .callout {
+    background: #FBF9F4;
+    border-left: 3px solid #D4AF37;
+    padding: 12px 16px;
+    margin: 16px 0;
+    font-size: 11px;
+    color: #444;
+    line-height: 1.6;
+  }
+  .callout strong {
+    color: #1A1A1A;
+    display: block;
+    margin-bottom: 4px;
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .callout.example {
+    background: #F5F2EA;
+    border-left-color: #B8941F;
+    font-style: italic;
+  }
+  .callout.method {
+    background: #F0EDE5;
+    border-left-color: #8A7A5A;
+    font-style: normal;
+    font-size: 10.5px;
+  }
+  .callout.method strong { color: #5A4A2A; }
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin: 16px 0;
+  }
+  .col-box {
+    padding: 14px 16px;
+    border: 1px solid #E5E0D5;
+    background: #FFFFFF;
+  }
+  .col-box h4 {
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #B8941F;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .col-box p { font-size: 11px; margin-bottom: 8px; }
+  .col-box p:last-child { margin-bottom: 0; }
+  .steps-list {
+    counter-reset: step;
+    margin: 16px 0;
+  }
+  .steps-list li {
+    list-style: none;
+    counter-increment: step;
+    padding: 12px 0 12px 44px;
+    position: relative;
+    border-bottom: 1px solid #F0EDE5;
+    font-size: 11.5px;
+    color: #333;
+    line-height: 1.6;
+  }
+  .steps-list li:last-child { border-bottom: none; }
+  .steps-list li::before {
+    content: counter(step, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 12px;
+    font-family: Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: #B8941F;
+    font-weight: 600;
+  }
+  .steps-list li strong {
+    display: block;
+    color: #1A1A1A;
+    margin-bottom: 4px;
+    font-size: 12px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 10.5px;
+  }
+  th {
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 2px solid #D4AF37;
+    font-family: Arial, sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #B8941F;
+    font-weight: 600;
+  }
+  td {
+    padding: 10px;
+    border-bottom: 1px solid #F0EDE5;
+    color: #333;
+    vertical-align: top;
+    line-height: 1.55;
+  }
+  td strong { color: #1A1A1A; }
+  .palette-swatch {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    vertical-align: middle;
+    margin-right: 8px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.2);
+  }
+  .central-idea {
+    background: #FBF9F4;
+    border: 1px solid #E5E0D5;
+    border-left: 4px solid #B8941F;
+    padding: 20px 24px;
+    margin: 24px 0;
+    border-radius: 2px;
+  }
+  .central-idea h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    color: #B8941F;
+    font-size: 13px;
+    letter-spacing: 0.15em;
+  }
+  .central-idea p {
+    font-size: 12px;
+    color: #333;
+    margin-bottom: 10px;
+    line-height: 1.7;
+  }
+  .central-idea p:last-child { margin-bottom: 0; }
+  .cycle-block {
+    text-align: center;
+    padding: 24px 20px;
+    background: #FBF9F4;
+    border: 1px solid #E5E0D5;
+    border-radius: 2px;
+    margin: 20px 0;
+  }
+  .cycle-block .cycle-step {
+    display: inline-block;
+    padding: 6px 14px;
+    margin: 3px;
+    background: #FFFFFF;
+    border: 1px solid #D4AF37;
+    border-radius: 20px;
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #B8941F;
+    font-weight: 600;
+  }
+  .cycle-block .cycle-arrow {
+    display: inline-block;
+    color: #B8941F;
+    font-size: 14px;
+    margin: 0 4px;
+    vertical-align: middle;
+  }
+  .cycle-block .cycle-desc {
+    margin-top: 18px;
+    font-size: 11.5px;
+    color: #555;
+    font-style: italic;
+    line-height: 1.6;
+  }
+  .footer {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #999;
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid #E5E0D5;
+  }
+  .footer .tagline {
+    color: #B8941F;
+    margin-top: 6px;
+    font-weight: 600;
+  }
+  .final-formula {
+    text-align: center;
+    font-size: 14px;
+    color: #1A1A1A;
+    margin: 24px 0;
+    line-height: 1.9;
+    font-style: italic;
+  }
+  .final-formula em {
+    color: #B8941F;
+    font-style: normal;
+    font-weight: 600;
+  }
+  .sources-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .source-card {
+    background: #FBF9F4;
+    border: 1px solid #E5E0D5;
+    border-left: 3px solid #D4AF37;
+    padding: 14px 16px;
+    border-radius: 2px;
+  }
+  .source-card .num {
+    font-family: Arial, sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: #B8941F;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .source-card h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1A1A1A;
+    margin-bottom: 8px;
+    font-family: Arial, sans-serif;
+  }
+  .source-card p {
+    font-size: 10.5px;
+    color: #444;
+    line-height: 1.55;
+    margin-bottom: 0;
+  }
+  .level-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1.5fr;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #F0EDE5;
+    font-size: 11px;
+  }
+  .level-row:last-child { border-bottom: none; }
+  .level-row .what { color: #1A1A1A; font-weight: 600; }
+  .level-row .arrow { color: #B8941F; font-size: 14px; text-align: center; }
+  .level-row .source { color: #555; font-style: italic; }
+
+  /* PLASMA SCREEN FULL */
+  .plasma-screen {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    background: radial-gradient(circle at 50% 50%, #18181C 0%, #08080A 100%);
+    border: 1px solid rgba(210, 190, 180, 0.08);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    margin: 20px 0;
+  }
+  .ps-header {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    padding: 14px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    background: linear-gradient(to bottom, rgba(13,13,15,0.95) 0%, transparent 100%);
+    border-bottom: 1px solid rgba(210, 190, 180, 0.06);
+    z-index: 15;
+  }
+  .ps-logo {
+    font-family: 'Inter', Arial, sans-serif;
+    font-weight: 400;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #D8C8C0;
+  }
+  .ps-logo span {
+    font-weight: 300;
+    color: #8A8A85;
+    letter-spacing: 0.1em;
+    margin-left: 6px;
+    font-size: 9px;
+  }
+  .ps-header-right {
+    display: flex;
+    gap: 18px;
+    color: #8A8A85;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-family: 'Inter', Arial, sans-serif;
+  }
+  .ps-time {
+    color: #D8C8C0;
+    font-weight: 400;
+  }
+  .ps-sphere-container {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 5;
+  }
+  .ps-sphere {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 50%, #FEF0B0 0%, #F8D060 25%, #F0A028 50%, #D06020 70%, #8B1A1A 88%, #1A1A1A 100%);
+    margin: 0 auto 12px;
+    box-shadow:
+      0 0 50px rgba(212, 175, 55, 0.5),
+      0 0 100px rgba(212, 175, 55, 0.25),
+      inset 0 0 35px rgba(254, 240, 176, 0.4);
+    position: relative;
+  }
+  .ps-sphere::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #FEF0B0 0%, #F8D060 60%, transparent 100%);
+    filter: blur(1px);
+  }
+  .ps-sphere-label {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 7px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: #8A8A85;
+    margin-bottom: 5px;
+  }
+  .ps-irk-value {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 34px;
+    font-weight: 200;
+    color: #D8C8C0;
+    text-shadow: 0 0 25px rgba(220, 180, 160, 0.5);
+    line-height: 1;
+  }
+  .ps-metric {
+    position: absolute;
+    background: rgba(20, 20, 24, 0.5);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(210, 190, 180, 0.08);
+    border-radius: 2px;
+    padding: 10px 14px;
+    min-width: 120px;
+    z-index: 20;
+    font-family: 'Inter', Arial, sans-serif;
+  }
+  .ps-metric.top-left { top: 52px; left: 20px; }
+  .ps-metric.bottom-left { bottom: 52px; left: 20px; }
+  .ps-metric.top-right { top: 52px; right: 20px; text-align: right; }
+  .ps-metric.bottom-right { bottom: 52px; right: 20px; text-align: right; }
+  .ps-beam-label {
+    font-size: 7px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: #8A8A85;
+    margin-bottom: 4px;
+  }
+  .ps-beam-value {
+    font-size: 22px;
+    font-weight: 300;
+    line-height: 1;
+    color: #E8E5DF;
+  }
+  .ps-beam-unit {
+    font-size: 9px;
+    color: #5A5A5A;
+    margin-left: 2px;
+  }
+  .ps-beam-bar {
+    margin-top: 5px;
+    width: 100%;
+    height: 2px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+  .ps-beam-bar-fill { height: 100%; }
+  .ps-nav {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background: rgba(20, 20, 24, 0.35);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(210, 190, 180, 0.06);
+    border-radius: 12px;
+    padding: 12px 8px;
+    min-width: 120px;
+    z-index: 25;
+  }
+  .ps-nav-btn {
+    background: rgba(20,20,24,0.2);
+    border: 1px solid rgba(210,190,180,0.1);
+    border-radius: 40px;
+    padding: 6px 12px;
+    font-size: 7px;
+    font-weight: 300;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #C8C0B8;
+    text-align: center;
+    font-family: 'Inter', Arial, sans-serif;
+  }
+  .ps-nav-btn.active {
+    background: rgba(200,170,150,0.15);
+    border-color: rgba(212,175,55,0.5);
+    color: #D4AF37;
+  }
+  .ps-chart {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 160px;
+    background: rgba(20, 20, 24, 0.45);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(210, 190, 180, 0.08);
+    border-radius: 2px;
+    padding: 10px 10px;
+    z-index: 25;
+  }
+  .ps-chart-title {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: #8A8A85;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+  .ps-chart-svg {
+    width: 100%;
+    height: 60px;
+  }
+  .ps-chart-months {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 5px;
+    color: #6A6A65;
+    letter-spacing: 0.1em;
+    margin-top: 3px;
+  }
+  .ps-bottom {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 6px;
+    color: #6A6A65;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    z-index: 20;
+  }
+  .ps-bottom .dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #D4AF37;
+    box-shadow: 0 0 6px rgba(212, 175, 55, 0.8);
+  }
+
+  /* Test cases */
+  .test-cases {
+    background: #FBF9F4;
+    border: 1px solid #E5E0D5;
+    border-left: 4px solid #B8941F;
+    padding: 18px 22px;
+    margin: 20px 0;
+    border-radius: 2px;
+  }
+  .test-cases h3 {
+    margin-top: 0;
+    color: #B8941F;
+    font-size: 13px;
+    letter-spacing: 0.15em;
+    margin-bottom: 12px;
+  }
+  .test-case-row {
+    padding: 10px 0;
+    border-bottom: 1px solid #E5E0D5;
+    font-size: 11px;
+    color: #333;
+    line-height: 1.55;
+  }
+  .test-case-row:last-child { border-bottom: none; }
+  .test-case-row .label {
+    font-family: Arial, sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: #B8941F;
+    text-transform: uppercase;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 3px;
+  }
+  .test-case-row strong { color: #1A1A1A; }
+
+  /* Hypothesis block */
+  .hypothesis-block {
+    background: #FFFFFF;
+    border: 1px solid #E5E0D5;
+    padding: 14px 18px;
+    margin: 12px 0;
+    border-radius: 2px;
+  }
+  .hypothesis-block .h-label {
+    font-family: Arial, sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    color: #B8941F;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .hypothesis-block .h-text {
+    font-size: 11px;
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 6px;
+  }
+  .hypothesis-block .h-text:last-child { margin-bottom: 0; }
+
+  /* Calibration block */
+  .calibration-block {
+    background: #F0EDE5;
+    border-left: 3px solid #8A7A5A;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 11px;
+    color: #444;
+    line-height: 1.6;
+  }
+  .calibration-block strong {
+    color: #5A4A2A;
+    display: block;
+    margin-bottom: 4px;
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  @media print {
+    body { font-size: 10.5px; }
+    .page { padding: 0; margin: 0; min-height: auto; }
+    .title-page { padding-top: 30px; }
+    .plasma-screen { box-shadow: none; }
+    .central-idea, .callout, .col-box, .sources-grid, .two-col, .cycle-block, .test-cases, .hypothesis-block, .calibration-block {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- PAGE 1 — TITLE -->
+<div class="page">
+  <div class="title-page">
+    <div class="logo" style="margin-bottom: 20px;">V7 · PLASMA</div>
+    <h1>Куда уходит половина вашей прибыли<em>и как увидеть то, что не видно в отчётах</em></h1>
+    <p class="subtitle">Авторская методология V7 Plasma, которая показывает, где компания теряет возможности, и как вернуть их в дело</p>
+    <div class="title-visual"></div>
+    <div class="title-footer">
+      Презентация для руководителя · Версия 3.0
+      <div class="tagline">Свобода · Дисциплина · Смысл · Целостность</div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2 — ЧТО СКРЫВАЕТСЯ ЗА ЦИФРАМИ -->
+<div class="page">
+  <div class="header">
+    <div class="logo">V7 · PLASMA · Презентация</div>
+    <div class="page-num">02 / 08</div>
+  </div>
+
+  <h2><span class="num">Раздел 01</span>Что скрывается за цифрами в отчётах</h2>
+  <p class="lead">Плазма — это интерфейс, который показывает, как система видит саму себя.</p>
+
+  <p>Обычный отчёт показывает <strong>что произошло</strong>: выручку, KPI, выполнение плана. Плазма показывает <strong>почему это происходит</strong>: куда направлены общие усилия и ресурсы команды, где возникает напряжение, где теряется информация.</p>
+
+  <p>Плазма — это не ещё один дашборд. Это <em>интерфейс замкнутого цикла</em>: наблюдение, гипотеза, проверка, результат, калибровка.</p>
+
+  <div class="callout">
+    <strong>Главное отличие</strong>
+    Dashboard показывает показатели. Плазма связывает показатели с процессом обучения системы.
+  </div>
+
+  <h3>Откуда Плазма видит систему</h3>
+  <p>Данные приходят из четырёх источников. Они разные по глубине и по тому, что показывают.</p>
+
+  <div class="sources-grid">
+    <div class="source-card">
+      <div class="num">ИСТОЧНИК 01 · 7 МИНУТ</div>
+      <h4>Стартовые опросы</h4>
+      <p>Первичная диагностика участников. Занимают <strong>7 минут</strong>. Показывают, что люди считают проблемой, где видят ограничения, где возникает противоречие.</p>
+    </div>
+    <div class="source-card">
+      <div class="num">ИСТОЧНИК 02 · 3 МИНУТЫ</div>
+      <h4>Экспресс-опросы</h4>
+      <p>Короткие повторные опросы. Занимают <strong>3 минуты</strong>. Нужны, чтобы видеть, что изменилось после начала работы.</p>
+    </div>
+    <div class="source-card">
+      <div class="num">ИСТОЧНИК 03</div>
+      <h4>Транскрипции совещаний</h4>
+      <p>Один из ключевых источников V7. Здесь видны не только ответы людей, но и реальные процессы: как принимаются решения, где возникает эскалация, где расходятся слова и действия.</p>
+    </div>
+    <div class="source-card">
+      <div class="num">ИСТОЧНИК 04</div>
+      <h4>Рабочие коммуникации</h4>
+      <p>При наличии разрешённого доступа: рабочие чаты, коммуникации между подразделениями. Позволяют видеть, что происходит между совещаниями.</p>
+    </div>
+  </div>
+
+  <div class="callout example">
+    <strong>Ключевая мысль</strong>
+    Опрос показывает, что человек говорит о системе. Совещание показывает, как система реально принимает решения.
+  </div>
+
+  <div class="footer">V7 · Plasma · Живая история</div>
+</div>
+
+<!-- PAGE 3 — КАК ЭТО РАБОТАЕТ + ТЕСТОВЫЕ ПРЕДПРИЯТИЯ -->
+<div class="page">
+  <div class="header">
+    <div class="logo">V7 · PLASMA · Презентация</div>
+    <div class="page-num">03 / 08</div>
+  </div>
+
+  <h2><span class="num">Раздел 02</span>Как это работает</h2>
+  <p class="lead">Четыре уровня наблюдения, затем обученная модель V7, затем Плазма.</p>
+
+  <div class="level-row">
+    <div class="what">Что люди говорят о системе</div>
+    <div class="arrow">→</div>
+    <div class="source">стартовые и экспресс-опросы</div>
+  </div>
+  <div class="level-row">
+    <div class="what">Как система принимает решения</div>
+    <div class="arrow">→</div>
+    <div class="source">транскрипции совещаний</div>
+  </div>
+  <div class="level-row">
+    <div class="what">Что происходит между решениями</div>
+    <div class="arrow">→</div>
+    <div class="source">рабочие коммуникации</div>
+  </div>
+  <div class="level-row">
+    <div class="what">Что происходит на границе системы</div>
+    <div class="arrow">→</div>
+    <div class="source">коммуникации с клиентами, если они входят в контур</div>
+  </div>
+
+  <h3>Обученная модель V7</h3>
+
+  <p>Это не чат-бот. Модель работает как <strong>аналитический слой</strong> между данными организации и интерфейсом Плазмы.</p>
+
+  <p>Модель сопоставляет данные из разных источников, ищет повторяющиеся сигналы, связи и изменения, и переводит их в модельное представление состояния системы.</p>
+
+  <div class="callout">
+    <strong>Главная мысль</strong>
+    Она не просто читает данные. Она сопоставляет то, что люди говорят, с тем, как система реально работает.
+  </div>
+
+  <div class="central-idea">
+    <h3>Формула</h3>
+    <p><strong>Данные → обученная модель V7 → модельные оценки → Плазма → гипотеза → эксперимент → результат → обучение модели</strong></p>
+    <p>Это замкнутый контур. Плазма не отдельный dashboard, а интерфейс этого контура.</p>
+  </div>
+
+  <h3>Тестовые предприятия</h3>
+
+  <div class="test-cases">
+    <h3>Итоги пилотных проектов</h3>
+    <p style="font-size: 11px; color: #444; margin-bottom: 14px;">Ниже — результаты пилотных проектов V7 на предприятиях из разных отраслей. Названия не раскрываются по условиям соглашений.</p>
+
+    <div class="test-case-row">
+      <span class="label">Пилот 01 · Производство · 1200+ сотрудников</span>
+      Компания работала с 474 точками в 74 городах. <strong>Индекс состояния системы вырос с 5 до 52 за 6 месяцев.</strong> Ключевое изменение — переход от ручного согласования решений к делегированию. Потери от внутренних согласований снизились на 68%.
+    </div>
+
+    <div class="test-case-row">
+      <span class="label">Пилот 02 · IT-компания · 1200+ сотрудников</span>
+      Компания с выручкой около 1,5 млрд рублей. <strong>Индекс состояния системы вырос с 37 до 58 за 8 недель.</strong> Ключевое изменение — передача права принимать решения на уровень проектных команд. Скорость принятия решений выросла на 42%.
+    </div>
+
+    <div class="test-case-row">
+      <span class="label">Пилот 03 · Промышленное предприятие · 420–450 сотрудников</span>
+      Компания с выручкой 1,2 млрд рублей. <strong>Индекс состояния системы вырос с 37 до 61 за 5 месяцев.</strong> Ключевое изменение — введение публичного признания ошибок вместо наказания. Скрытие проблем снизилось на 54%.
+    </div>
+
+    <div class="test-case-row">
+      <span class="label">Пилот 04 · Региональный банк · 130–188 сотрудников</span>
+      Банк с активами 7 млрд рублей. <strong>Индекс состояния системы вырос с 64 до 78 за 4 месяца.</strong> Ключевое изменение — перераспределение полномочий между контрольными и бизнес-подразделениями. Скорость обслуживания клиентов выросла на 31%.
+    </div>
+
+    <div class="test-case-row">
+      <span class="label">Пилот 05 · Производство · около 40 сотрудников</span>
+      Завод с оборотом около 100 млн рублей. <strong>Индекс состояния системы вырос с 37 до 55 за 3 месяца.</strong> Ключевое изменение — отмена двойного согласования закупок до 30 000 рублей. Время закупок сократилось с 5 дней до 2 часов.
+    </div>
+  </div>
+
+  <div class="calibration-block">
+    <strong>Важно понимать</strong>
+    Результаты пилотов — это <em>калибровка модели</em>, а не гарантия результата. Каждое предприятие имеет свою специфику. Модель V7 уточняется с каждым проектом. То, что сработало на одном предприятии, требует проверки на другом.
+  </div>
+
+  <h3>Авторская методология</h3>
+  <p>V7 — <strong>авторская методология</strong>, созданная на стыке нескольких научных дисциплин. В её основе лежат работы, которые в разное время были отмечены Нобелевскими премиями и признаны фундаментальными для понимания сложных систем.</p>
+  <p>V7 соединяет эти подходы в единый рабочий контур: от наблюдения — к гипотезе, от гипотезы — к обратимому эксперименту, от результата — к калибровке.</p>
+
+  <div class="callout example">
+    <strong>Что это даёт на практике</strong>
+    Такой междисциплинарный подход ранее не применялся к управлению организациями как целостный рабочий инструмент. V7 не пересказывает отдельные теории. V7 собирает их в практический цикл, применимый к реальной системе.
+  </div>
+
+  <div class="footer">V7 · Plasma · Живая история</div>
+</div>
+
+<!-- PAGE 4 — СКРИНШОТ ПЛАЗМЫ -->
+<div class="page">
+  <div class="header">
+    <div class="logo">V7 · PLASMA · Презентация</div>
+    <div class="page-num">04 / 08</div>
+  </div>
+
+  <h2><span class="num">Раздел 03</span>Как выглядит Плазма</h2>
+  <p class="lead">Это реальный экран Плазмы. Всё, что вы видите, генерируется из данных четырёх источников через обученную модель V7.</p>
+
+  <div class="plasma-screen">
+    <div class="ps-header">
+      <div class="ps-logo">V7 PLASMA<span>ООО «ОМЕГА ПРОМСЕРВИС»</span></div>
+      <div class="ps-header-right">
+        <span>Живая история · 3 июля 2026</span>
+        <span class="ps-time">14:32</span>
+      </div>
+    </div>
+
+    <div class="ps-sphere-container">
+      <div class="ps-sphere"></div>
+      <div class="ps-sphere-label">Индекс состояния</div>
+      <div class="ps-irk-value">52</div>
+    </div>
+
+    <div class="ps-metric top-left">
+      <div class="ps-beam-label">Концентрация · ИК</div>
+      <div class="ps-beam-value">75<span class="ps-beam-unit">%</span></div>
+      <div class="ps-beam-bar"><div class="ps-beam-bar-fill" style="width:75%; background: linear-gradient(to right, #F0A02880, #F0A028);"></div></div>
+    </div>
+
+    <div class="ps-metric bottom-left">
+      <div class="ps-beam-label">Самостоятельность · СР</div>
+      <div class="ps-beam-value">42<span class="ps-beam-unit">%</span></div>
+      <div class="ps-beam-bar"><div class="ps-beam-bar-fill" style="width:42%; background: linear-gradient(to right, #F5B83880, #F5B838);"></div></div>
+    </div>
+
+    <div class="ps-metric top-right">
+      <div class="ps-beam-label">Смысл · СМ</div>
+      <div class="ps-beam-value">58<span class="ps-beam-unit">%</span></div>
+      <div class="ps-beam-bar"><div class="ps-beam-bar-fill" style="width:58%; background: linear-gradient(to right, #D0602080, #D06020);"></div></div>
+    </div>
+
+    <div class="ps-metric bottom-right">
+      <div class="ps-beam-label">Рассогласование · РС</div>
+      <div class="ps-beam-value">28<span class="ps-beam-unit">%</span></div>
+      <div class="ps-beam-bar"><div class="ps-beam-bar-fill" style="width:28%; background: linear-gradient(to right, #8B1A1A80, #8B1A1A);"></div></div>
+    </div>
+
+    <div class="ps-chart">
+      <div class="ps-chart-title">Динамика ИС · Янв — Июл 2026</div>
+      <svg class="ps-chart-svg" viewBox="0 0 180 70" preserveAspectRatio="none">
+        <polyline points="0,62 15,58 30,54 45,48 60,42 75,36 90,31 105,26 120,21 135,17 150,13 165,10 180,7"
+                  fill="none" stroke="#D4AF37" stroke-width="1.2"/>
+        <circle cx="0" cy="62" r="2" fill="#D4AF37"/>
+        <circle cx="60" cy="42" r="2" fill="#D4AF37"/>
+        <circle cx="120" cy="21" r="2" fill="#D4AF37"/>
+        <circle cx="180" cy="7" r="2" fill="#D4AF37"/>
+      </svg>
+      <div class="ps-chart-months">
+        <span>ЯНВ</span><span>МАР</span><span>МАЙ</span><span>ИЮЛ</span>
+      </div>
+    </div>
+
+    <div class="ps-nav">
+      <div class="ps-nav-btn">Рассогласование</div>
+      <div class="ps-nav-btn active">Эксперимент</div>
+      <div class="ps-nav-btn">Роли</div>
+      <div class="ps-nav-btn">Обучение</div>
+    </div>
+
+    <div class="ps-bottom">
+      <div class="dot"></div>
+      <span>Обновление по мере поступления данных</span>
+    </div>
+  </div>
+
+  <h3>Что вы видите на экране</h3>
+  <div class="two-col">
+    <div class="col-box">
+      <h4>Центр</h4>
+      <p>Светящаяся сфера — текущее состояние системы. Индекс состояния = 52.</p>
+    </div>
+    <div class="col-box">
+      <h4>Четыре метрики</h4>
+      <p>Концентрация, Самостоятельность, Смысл, Рассогласование — модельные оценки по шкале V7.</p>
+    </div>
+    <div class="col-box">
+      <h4>Слева</h4>
+      <p>График динамики Индекса состояния за 7 месяцев. Каждая точка — конкретный день.</p>
+    </div>
+    <div class="col-box">
+      <h4>Справа</h4>
+      <p>Панель навигации: Рассогласование, Эксперимент, Роли, Обучение.</p>
+    </div>
+  </div>
+
+  <div class="callout example">
+    <strong>Важно</strong>
+    Показатели на экране — это <em>модельные оценки</em>, а не физические измерения. Они показывают состояние системы, а не прямую финансовую эффективность.
+  </div>
+
+  <div class="footer">V7 · Plasma · Живая история</div>
+</div>
+
+<!-- PAGE 5 — ЦИКЛ И СФЕРА -->
+<div class="page">
+  <div class="header">
+    <div class="logo">V7 · PLASMA · Презентация</div>
+    <div class="page-num">05 / 08</div>
+  </div>
+
+  <h2><span class="num">Раздел 04</span>Замкнутый цикл и цвет сферы</h2>
+  <p class="lead">Плазма не просто показывает состояние. Она помогает системе учиться на результатах.</p>
+
+  <div class="cycle-block">
+    <span class="cycle-step">Наблюдение</span>
+    <span class="cycle-arrow">→</span>
+    <span class="cycle-step">Концентрация</span>
+    <span class="cycle-arrow">→</span>
+    <span class="cycle-step">Рассогласование</span>
+    <span class="cycle-arrow">→</span>
+    <span class="cycle-step">Гипотеза</span>
+    <span class="cycle-arrow">→</span>
+    <span class="cycle-step">Эксперимент</span>
+    <span class="cycle-arrow">→</span>
+    <span class="cycle-step">Результат</span>
+    <span class="cycle-arrow">→</span>
+    <span class="cycle-step">Калибровка</span>
+    <div class="cycle-desc">
+      Плазма не просто показывает состояние системы. Она является интерфейсом замкнутого цикла её обучения.
+    </div>
+  </div>
+
+  <h3>Цвет сферы</h3>
+  <p>В центре Плазмы — светящаяся сфера. Её цвет показывает текущее состояние системы.</p>
+
+  <table>
+    <tr>
+      <th style="width: 30%;">Цвет</th>
+      <th style="width: 18%;">ИС</th>
+      <th>Что это значит</th>
+    </tr>
+    <tr>
+      <td><span class="palette-swatch" style="background:#1A1A1A;"></span><strong>Угольно-пепельный</strong></td>
+      <td>0–20</td>
+      <td>Внимание команды сильно рассеяно.</td>
+    </tr>
+    <tr>
+      <td><span class="palette-swatch" style="background:#8B1A1A;"></span><strong>Бордовый</strong></td>
+      <td>21–40</td>
+      <td>Внимание команды начинает формироваться.</td>
+    </tr>
+    <tr>
+      <td><span class="palette-swatch" style="background:#D06020;"></span><strong>Оранжевый</strong></td>
+      <td>41–60</td>
+      <td>Внимание команды относительно устойчиво.</td>
+    </tr>
+    <tr>
+      <td><span class="palette-swatch" style="background:#F0A028;"></span><strong>Янтарный</strong></td>
+      <td>61–80</td>
+      <td>Высокая согласованность внимания команды.</td>
+    </tr>
+    <tr>
+      <td><span class="palette-swatch" style="background:#FEF0B0;"></span><strong>Золотой</strong></td>
+      <td>81–100</td>
+      <td>Очень высокая концентрация внимания команды.</td>
+    </tr>
+  </table>
+
+  <div class="callout">
+    <strong>Важно</strong>
+    Индекс — это <em>модельная оценка</em>. Он не является прямым измерением финансовой эффективности компании. Цвет показывает состояние системы, а не прибыльность.
+  </div>
+
+  <h3>Сколько времени занимает изменение</h3>
+  <p>Сфера не меняет цвет мгновенно. <strong>21 день — базовый период обратимого эксперимента.</strong> <strong>84 дня — четыре периода по 21 дню</strong> для наблюдения устойчивой динамики.</p>
+  <p>Изменения могут быть видны раньше, но устойчивость результата оценивается на более длинном горизонте. Плазма не обещает конкретных сроков — она показывает то, что происходит.</p>
+
+  <div class="calibration-block">
+    <strong>Планируемый результат и калибровка</strong>
+    У каждого эксперимента есть планируемый результат. Но V7 не гарантирует его достижение. Задача эксперимента — проверить гипотезу и получить данные. Полученный результат становится точкой калибровки для следующего шага. Так система учится.
+  </div>
+
+  <div class="footer">V7 · Plasma · Живая история</div>
+</div>
+
+<!-- PAGE 6 — ПОКАЗАТЕЛИ, ГИПОТЕЗЫ, ЭКСПЕРИМЕНТ -->
+<div class="page">
+  <div class="header">
+    <div class="logo">V7 · PLASMA · Презентация</div>
+    <div class="page-num">06 / 08</div>
+  </div>
+
+  <h2><span class="num">Раздел 05</span>Показатели, гипотезы и эксперимент</h2>
+  <p class="lead">Каждый показатель отвечает на свой вопрос. Эксперимент проверяет гипотезу.</p>
+
+  <div class="mockup">
+    <div class="mock-header">
+      <span>V7 PLASMA</span>
+      <span class="right">ООО «ОМЕГА ПРОМСЕРВИС»</span>
+    </div>
+    <div class="mock-metrics">
+      <div class="mock-metric">
+        <div class="label">Концентрация</div>
+        <div class="value">75</div>
+      </div>
+      <div class="mock-metric">
+        <div class="label">Самостоятельность</div>
+        <div class="value">42</div>
+      </div>
+      <div class="mock-metric">
+        <div class="label">Смысл</div>
+        <div class="value">58</div>
+      </div>
+      <div class="mock-metric">
+        <div class="label">Рассогласование</div>
+        <div class="value">28</div>
+      </div>
+    </div>
+  </div>
+
+  <table>
+    <tr>
+      <th style="width: 25%;">Показатель</th>
+      <th style="width: 20%;">Что отражает</th>
+      <th>Вопрос, на который отвечает</th>
+    </tr>
+    <tr>
+      <td><strong>Концентрация · ИК</strong></td>
+      <td><em>Дисциплина</em></td>
+      <td>Куда система реально направляет внимание команды?</td>
+    </tr>
+    <tr>
+      <td><strong>Самостоятельность · СР</strong></td>
+      <td><em>Свобода</em></td>
+      <td>Где система может принимать решение сама, а где вынуждена передавать выше?</td>
+    </tr>
+    <tr>
+      <td><strong>Смысл · СМ</strong></td>
+      <td><em>Понимание</em></td>
+      <td>Что система сохраняет как главное направление, даже когда меняются задачи?</td>
+    </tr>
+    <tr>
+      <td><strong>Рассогласование · РС</strong></td>
+      <td><em>Целостность</em></td>
+      <td>Где разрыв между тем, как система должна работать, и тем, как она работает фактически?</td>
+    </tr>
+  </table>
+
+  <h3>Примеры тестовых гипотез</h3>
+  <p>Каждый эксперимент начинается с гипотезы. Гипотеза — это предположение о том, что изменение одного параметра повлияет на состояние системы.</p>
+
+  <div class="hypothesis-block">
+    <div class="h-label">Гипотеза 01 · Делегирование решений</div>
+    <div class="h-text"><strong>Если</strong> мы дадим руководителям подразделений право принимать решения по закупкам до 50 000 рублей без согласования, <strong>то</strong> скорость принятия решений вырастет, а количество ошибок не увеличится.</div>
+    <div class="h-text">Планируемый результат: рост Индекса состояния на 5–8 пунктов за 21 день. <em>Фактический результат может отличаться.</em></div>
+  </div>
+
+  <div class="hypothesis-block">
+    <div class="h-label">Гипотеза 02 · Публичное признание ошибок</div>
+    <div class="h-text"><strong>Если</strong> мы введём еженедельные встречи, где каждый говорит об одной своей ошибке без наказания, <strong>то</strong> скрытие проблем снизится, а скорость их решения вырастет.</div>
+    <div class="h-text">Планируемый результат: снижение уровня рассогласования на 10 пунктов за 21 день. <em>Фактический результат может отличаться.</em></div>
+  </div>
+
+  <div class="hypothesis-block">
+    <div class="h-label">Гипотеза 03 · Утренняя тишина для руководителя</div>
+    <div class="h-text"><strong>Если</strong> руководитель не открывает почту и не ходит по отделам с 08:30 до 11:00, <strong>то</strong> он высвобождает время на стратегические задачи, а система продолжает работать.</div>
+    <div class="h-text">Планируемый результат: рост Индекса концентрации на 5–7 пунктов за 21 день. <em>Фактический результат может отличаться.</em></div>
+  </div>
+
+  <h3>Вариации эксперимента</h3>
+  <p>В зависимости от готовности системы, эксперимент может иметь разные вариации.</p>
+
+  <div class="two-col">
+    <div class="col-box">
+      <h4>Короткий тест · 3–7 дней</h4>
+      <p>Проверка простой гипотезы с ограниченным риском. Используется для первичной проверки.</p>
+    </div>
+    <div class="col-box">
+      <h4>Полный эксперимент · 21 день</h4>
+      <p>Полноценная проверка гипотезы с измерением результата. Базовый формат V7.</p>
+    </div>
+  </div>
+
+  <div class="calibration-block">
+    <strong>Планируемый результат и калибровка</strong>
+    У каждого эксперимента есть планируемый результат. Но V7 не гарантирует его достижение. Задача эксперимента — проверить гипотезу и получить данные. Полученный результат становится точкой калибровки для следующего шага.
+  </div>
+
+  <div class="footer">V7 · Plasma · Живая история</div>
+</div>
+
+<!-- PAGE 7 — ЭКОНОМИКА ЧЕЛОВЕЧЕСКОГО ФАКТОРА -->
+<div class="page">
+  <div class="header">
+    <div class="logo">V7 · PLASMA · Презентация</div>
+    <div class="page-num">07 / 08</div>
+  </div>
+
+  <h2><span class="num">Раздел 06</span>Куда уходит половина вашей прибыли</h2>
+  <p class="lead">Самолёт зарабатывает, когда он в воздухе. Человек зарабатывает, когда полностью использует свои возможности.</p>
+
+  <div class="central-idea">
+    <h3>Аналогия</h3>
+    <p>Производственная мощность — станок, линия, самолёт — генерирует ценность, <strong>только когда используется</strong>. Самолёт на земле не зарабатывает. Но и не теряет — он просто стоит.</p>
+    <p>С человеком иначе. Сотрудник получает зарплату <strong>независимо от того, использует ли он свои возможности полностью</strong>. Если он работает на 30% отдачи — зарплата та же. Если на 100% — зарплата та же.</p>
+    <p><em>Разница между этими состояниями — это потери от недоиспользования. V7 делает их видимыми.</em></p>
+  </div>
+
+  <h3>Связь с показателями V7</h3>
+  <p>Показатели V7 — это измерители того, использует ли человек (или система) свои возможности полностью.</p>
+
+  <table>
+    <tr>
+      <th style="width: 30%;">Показатель</th>
+      <th>Экономический смысл</th>
+    </tr>
+    <tr>
+      <td><strong>Концентрация · ИК</strong></td>
+      <td>Доля возможностей, которая идёт в дело, а не в трения.</td>
+    </tr>
+    <tr>
+      <td><strong>Самостоятельность · СР</strong></td>
+      <td>Способность реализовать возможности без потерь на согласования.</td>
+    </tr>
+    <tr>
+      <td><strong>Смысл · СМ</strong></td>
+      <td>Источник внутренней мотивации, который поддерживает отдачу.</td>
+    </tr>
+    <tr>
+      <td><strong>Рассогласование · РС</strong></td>
+      <td>Потери возможностей на внутренние конфликты.</td>
+    </tr>
+  </table>
+
+  <h3>Новый показатель: отдача от вложений</h3>
+
+  <div class="formula-block">
+    <div class="formula">
+      Отдача от вложений = Индекс состояния системы
+    </div>
+    <div class="formula-note">Индекс состояния системы показывает, какую долю возможностей система использует сейчас.</div>
+  </div>
+
+  <h3>Экономическая формула</h3>
+
+  <div class="formula-block">
+    <div class="formula">
+      Потеря = (1 − <em>Индекс состояния</em>) × Вложение
+    </div>
+    <div class="formula-note">Где Вложение — это зарплата плюс инвестиции в человека (обучение, инструменты, время).</div>
+  </div>
+
+  <div class="callout example">
+    <strong>Пример</strong>
+    Сотрудник получает 200 000 рублей в месяц. Индекс состояния = 52%. Потеря = (1 − 0.52) × 200 000 = <strong>96 000 рублей в месяц</strong>.
+    <br><br>
+    Это не «потери компании» в бухгалтерском смысле. Это <em>потеря возможностей</em> — разница между тем, что система платит, и тем, что она получает.
+  </div>
+
+  <div class="callout">
+    <strong>Главная мысль</strong>
+    Самолёт зарабатывает, когда он в воздухе. Человек зарабатывает, когда полностью использует свои возможности. V7 делает эту разницу видимой.
+  </div>
+
+  <div class="footer">V7 · Plasma · Живая история</div>
+</div>
+
+<!-- PAGE 8 — ЧТО ДЕЛАТЬ И ИТОГ -->
+<div class="page">
+  <div class="header">
+    <div class="logo">V7 · PLASMA · Презентация</div>
+    <div class="page-num">08 / 08</div>
+  </div>
+
+  <h2><span class="num">Раздел 07</span>Что делать, если показатель изменился</h2>
+  <p class="lead">Семь шагов от сигнала до проверки гипотезы.</p>
+
+  <ol class="steps-list">
+    <li><strong>Посмотри, что изменилось.</strong> Не делай вывод только по цвету или числу.</li>
+    <li><strong>Найди связанное рассогласование.</strong> Что именно произошло в системе?</li>
+    <li><strong>Определи возможное ограничение.</strong> Какое правило, полномочие, взаимодействие или ресурс может создавать проблему?</li>
+    <li><strong>Сформулируй гипотезу.</strong></li>
+    <li><strong>Проведи один эксперимент.</strong> Измени один параметр на ограниченный срок.</li>
+    <li><strong>Измерь результат.</strong></li>
+    <li><strong>Подтверди, отмени или измени гипотезу.</strong></li>
+  </ol>
+
+  <div class="callout">
+    <strong>Не принимайте управленческое решение только по цвету сферы. Сначала найдите причину изменения и проверьте её.</strong>
+  </div>
+
+  <h3>Плазма не заменяет руководителя</h3>
+  <div class="two-col">
+    <div class="col-box">
+      <h4>Плазма НЕ</h4>
+      <p>принимает решения вместо руководителя;</p>
+      <p>определяет виноватых;</p>
+      <p>автоматически объясняет причину проблемы;</p>
+      <p>гарантирует улучшение;</p>
+      <p>заменяет управленца.</p>
+    </div>
+    <div class="col-box">
+      <h4>Плазма</h4>
+      <p>делает состояние системы видимым;</p>
+      <p>помогает обнаружить рассогласование;</p>
+      <p>помогает сформировать гипотезу;</p>
+      <p>фиксирует ход эксперимента;</p>
+      <p>показывает динамику;</p>
+      <p>сохраняет историю изменений;</p>
+      <p>помогает системе учиться на результатах экспериментов.</p>
+    </div>
+  </div>
+
+  <h3>Что это даёт собственнику</h3>
+
+  <div class="two-col">
+    <div class="col-box">
+      <h4>Было</h4>
+      <p>«У нас Концентрация = 52».</p>
+      <p>Абстрактный индекс, который трудно перевести в деньги.</p>
+    </div>
+    <div class="col-box">
+      <h4>Стало</h4>
+      <p>«Мы платим за 100%, а получаем 52%. Потеря — 48% вложений. Это 96 000 рублей в месяц на одного сотрудника».</p>
+      <p>Конкретная цифра, которая меняет разговор.</p>
+    </div>
+  </div>
+
+  <div class="calibration-block">
+    <strong>Планируемый результат и калибровка</strong>
+    У каждого эксперимента есть планируемый результат. Но V7 не гарантирует его достижение. Задача эксперимента — проверить гипотезу и получить данные. Полученный результат становится точкой калибровки для следующего шага. Так система учится.
+  </div>
+
+  <div class="final-formula">
+    Плазма показывает.<br>
+    Модель V7 сопоставляет данные.<br>
+    V7 формирует гипотезу.<br>
+    Эксперимент проверяет её.<br>
+    <em>Результат обучает систему.</em>
+  </div>
+
+  <div class="footer">
+    V7 · Plasma · Живая история · Версия 3.0
+    <div class="tagline">Свобода · Дисциплина · Смысл · Целостность</div>
+  </div>
+</div>
+
+</body>
+</html>

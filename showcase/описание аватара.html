@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Уралметконструкция — Аватар компании · Вступление</title>
+<style>
+  @page { size: A4 landscape; margin: 8mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #1a1a1a;
+    margin: 0;
+    padding: 24px;
+    line-height: 1.45;
+  }
+  .page { max-width: 1200px; margin: 0 auto; }
+
+  /* ===== БЛОК ВСТУПЛЕНИЯ (вставляется в аватар) ===== */
+  .intro-block {
+    background: #fdf6e3;
+    border: 1px solid #e5d5a8;
+    border-left: 4px solid #b8860b;
+    border-radius: 8px;
+    padding: 20px 24px;
+    page-break-inside: avoid;
+  }
+  .intro-block h3 {
+    font-size: 11px;
+    font-weight: 700;
+    color: #b8860b;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 14px 0;
+  }
+  .intro-block p {
+    font-size: 10.5px;
+    color: #333;
+    line-height: 1.65;
+    margin: 0 0 12px 0;
+  }
+  .intro-block p:last-child { margin-bottom: 0; }
+  .intro-block strong { color: #1a1a1a; font-weight: 700; }
+  .intro-block .lead-word {
+    display: inline-block;
+    color: #b8860b;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 9px;
+    margin-right: 4px;
+  }
+
+  /* ===== ОБВОДКА ДЛЯ ДЕМОНСТРАЦИИ (не вставлять в аватар) ===== */
+  .demo-note {
+    margin-top: 28px;
+    padding: 14px 18px;
+    background: #f5f5f5;
+    border: 1px dashed #ccc;
+    border-radius: 6px;
+    font-size: 9px;
+    color: #666;
+    line-height: 1.5;
+  }
+  .demo-note strong { color: #333; }
+  .demo-note code {
+    background: #e8e8e8;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 8.5px;
+    color: #b8860b;
+    font-weight: 600;
+  }
+
+  @media print {
+    body { padding: 0; }
+    .intro-block { background: #fdf6e3 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; page-break-inside: avoid; }
+    .demo-note { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ============ ЭТОТ БЛОК ВСТАВЛЯЕТСЯ В АВАТАР ============ -->
+  <div class="intro-block">
+    <h3>Что это и зачем</h3>
+
+    <p><span class="lead-word">Что вы видите.</span> Это аватар компании. Не отчёт, не таблица с цифрами. Восемь слоёв — производство, финансы, продажи, цена, люди, Шлюзы — обычно живут отдельно, каждый в своей папке. Здесь они собраны в одну картину. И на этой картине видно, где компания держит форму, а где гнётся.</p>
+
+    <p><span class="lead-word">Зачем это.</span> Обычный отчёт говорит, что случилось: выручка упала, сроки сорваны. Но он не говорит, почему. Аватар показывает причину — и что будет, если поменять одно правило. Это не фотография компании. Это живая модель: можно попробовать решение и увидеть последствия до того, как вы его примете.</p>
+
+    <p><span class="lead-word">Как это работает.</span> В основе — методология V7 и три вещи, которые давно известны в управлении, но редко собраны вместе. Первая: у любой системы есть узкое место, и всё движется со скоростью этого места — здесь это сварка. Вторая: если поправить одно, может сломаться другое — поэтому аватар смотрит на всю картину сразу, а не на один цех. Третья: любое решение — это проверка. Сделали шаг, посмотрели, что вышло, поправили. Каждую секунду модель показывает главное ограничение и точку, куда смотреть всей команде.</p>
+
+    <p><span class="lead-word">Что с этим делать.</span> Не устраивать реформы. Проверять гипотезы: один небольшой шаг на 3–21 день, замер, вывод. Аватар показывает, где форма гнётся — и какой шаг её выпрямит. Дальше — просто проверить.</p>
+  </div>
+  <!-- ============ КОНЕЦ БЛОКА ============ -->
+
+  <div class="demo-note">
+    <strong>Как вставить в аватар:</strong> скопируй только <code>&lt;div class="intro-block"&gt;...&lt;/div&gt;</code> (без <code>.demo-note</code>) и вставь в файл аватара сразу после строки с <code>subtitle</code> — перед <code>&lt;div class="status-bar"&gt;</code>. CSS для <code>.intro-block</code> добавь в <code>&lt;style&gt;</code> аватара (блок с комментарием «БЛОК ВСТУПЛЕНИЯ»). В <code>@media print</code> добавь строку для печати. Всё совпадёт по цвету и рамке со статус-баром.
+  </div>
+
+</div>
+</body>
+</html>

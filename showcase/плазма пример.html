@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HTDC · Plasma</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@300;400;500&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#050810;--wht:#E0E4EC;--dim:#5A606C;--gray:#3A404C;--glass:#A8B0C0;--cool:#C8D8F0;
+--line:rgba(160,190,240,.12);
+--pl-bg:#0D0D0F;--pl-bg2:#18181C;--pl-text:#E8E5DF;--pl-dim:#8A8A8A;
+--pl-gold:#D4AF37;--pl-soft:#D8C8C0;--pl-line:rgba(210,190,180,.08);
+}
+html{scroll-behavior:smooth}
+body.page{background:var(--bg);color:var(--wht);font-family:'Inter',sans-serif;font-weight:300;
+line-height:1.6;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.bg-canvas{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.55}
+
+.nav{position:fixed;top:0;left:0;right:0;padding:28px 56px;z-index:100;display:flex;
+justify-content:space-between;align-items:center;
+background:linear-gradient(to bottom,rgba(5,8,16,.9),rgba(5,8,16,0));backdrop-filter:blur(4px)}
+.nav-logo{font-family:'Cormorant SC',serif;font-size:20px;letter-spacing:.4em;color:var(--glass);
+font-weight:400;text-decoration:none;transition:color .6s}
+.nav-logo:hover{color:var(--wht)}
+.nav-links{display:flex;gap:32px}
+.nav-links a{font-size:9px;letter-spacing:.4em;text-transform:uppercase;color:var(--dim);
+text-decoration:none;transition:color .4s;font-weight:300}
+.nav-links a:hover{color:var(--wht)}
+.nav-links a.active{color:var(--cool)}
+
+.wrap{max-width:1080px;margin:0 auto;padding:0 8vw}
+
+.hero{padding:20vh 0 8vh}
+.eyebrow{font-size:9px;letter-spacing:.5em;text-transform:uppercase;color:var(--dim);margin-bottom:28px}
+h1{font-family:'Cormorant SC',serif;font-size:clamp(34px,4.8vw,60px);font-weight:400;line-height:1.15;
+letter-spacing:.04em;text-transform:uppercase;margin-bottom:24px;color:var(--wht);
+text-shadow:0 4px 30px rgba(5,8,16,.9)}
+h1 em{font-style:italic;color:var(--cool)}
+.lead{font-size:17px;line-height:1.85;color:var(--glass);max-width:680px;margin-bottom:20px}
+.lead strong{color:var(--wht);font-weight:400}
+.lead-hint{font-size:14px;line-height:1.75;color:var(--dim);max-width:640px;margin-bottom:56px;font-style:italic}
+
+.mock{position:relative;width:100%;aspect-ratio:16/9;
+background:radial-gradient(circle at 50% 50%,var(--pl-bg2) 0%,#08080A 60%,#040406 100%);
+border:1px solid var(--pl-line);border-radius:4px;overflow:hidden;
+box-shadow:0 30px 80px rgba(0,0,0,.6);font-family:'Inter',Arial,sans-serif}
+
+.mock-top{position:absolute;top:0;left:0;right:0;height:48px;padding:0 24px;
+display:flex;justify-content:space-between;align-items:center;
+border-bottom:1px solid var(--pl-line);z-index:10;
+background:linear-gradient(to bottom,rgba(13,13,15,.95),rgba(13,13,15,.6))}
+.mock-brand{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--pl-soft)}
+.mock-brand span{color:var(--pl-dim);margin-left:10px;letter-spacing:.14em;font-size:9px}
+.mock-date{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--pl-dim)}
+
+.sphere-wrap{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:3}
+.sphere{width:180px;height:180px;border-radius:50%;margin:0 auto 14px;
+background:radial-gradient(circle at 50% 46%,#FEF0B0 0%,#F8D060 22%,#F0A028 45%,#D06020 68%,#8B1A1A 86%,#1A1A1A 100%);
+box-shadow:0 0 55px rgba(212,175,55,.55),0 0 110px rgba(212,175,55,.28),inset 0 0 40px rgba(254,240,176,.4);
+animation:breathe 5s ease-in-out infinite;position:relative}
+.sphere::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+width:50px;height:50px;border-radius:50%;background:radial-gradient(circle,#FEF0B0 0%,#F8D060 55%,transparent 100%);filter:blur(1px)}
+@keyframes breathe{0%,100%{transform:scale(1);opacity:.97}50%{transform:scale(1.03);opacity:1}}
+.sphere-label{font-size:8px;letter-spacing:.34em;text-transform:uppercase;color:var(--pl-dim);margin-bottom:6px}
+.sphere-value{font-family:'Inter',Arial,sans-serif;font-size:44px;font-weight:200;line-height:1;color:var(--pl-soft);text-shadow:0 0 30px rgba(220,180,160,.55)}
+
+.chip{position:absolute;background:rgba(20,20,24,.55);backdrop-filter:blur(10px);
+border:1px solid var(--pl-line);border-radius:3px;padding:12px 16px;width:170px;z-index:6}
+.chip .lbl{font-size:7px;letter-spacing:.2em;text-transform:uppercase;color:var(--pl-dim);margin-bottom:6px;white-space:nowrap}
+.chip .val{font-family:'Inter',Arial,sans-serif;font-size:22px;font-weight:300;color:var(--pl-text);line-height:1}
+.chip .val small{font-size:10px;color:#5A5A5A;margin-left:2px}
+.chip .bar{margin-top:8px;height:2px;background:rgba(255,255,255,.04);border-radius:1px;overflow:hidden}
+.chip .bar i{display:block;height:100%}
+.chip-tl{top:72px;left:24px}
+.chip-tr{top:72px;right:24px;text-align:right}
+.chip-bl{bottom:72px;left:24px}
+.chip-br{bottom:72px;right:24px;text-align:right}
+.chip-tr .bar i,.chip-br .bar i{margin-left:auto}
+
+.mini-chart{position:absolute;left:24px;top:50%;transform:translateY(-50%);width:170px;
+background:rgba(20,20,24,.45);backdrop-filter:blur(10px);border:1px solid var(--pl-line);border-radius:3px;padding:12px;z-index:6}
+.mini-chart .t{font-size:6px;letter-spacing:.2em;text-transform:uppercase;color:var(--pl-dim);text-align:center;margin-bottom:8px}
+.mini-chart svg{width:100%;height:60px;display:block}
+.mini-months{display:flex;justify-content:space-between;font-size:5px;color:#6A6A65;letter-spacing:.1em;margin-top:5px}
+
+.side-nav{position:absolute;right:24px;top:50%;transform:translateY(-50%);display:flex;
+flex-direction:column;gap:6px;z-index:6;background:rgba(20,20,24,.35);backdrop-filter:blur(10px);
+border:1px solid var(--pl-line);border-radius:14px;padding:12px 8px;width:170px}
+.side-btn{font-size:7px;letter-spacing:.18em;text-transform:uppercase;color:#C8C0B8;
+text-align:center;padding:7px 10px;border-radius:20px;border:1px solid rgba(210,190,180,.1)}
+.side-btn.on{background:rgba(200,170,150,.15);border-color:rgba(212,175,55,.5);color:var(--pl-gold)}
+
+section.blk{padding:10vh 0}
+.blk-eyebrow{font-size:9px;letter-spacing:.5em;text-transform:uppercase;color:var(--dim);margin-bottom:24px}
+h2{font-family:'Cormorant SC',serif;font-size:clamp(28px,3.4vw,44px);font-weight:400;
+letter-spacing:.04em;text-transform:uppercase;margin-bottom:20px;color:var(--wht);line-height:1.2}
+h2 em{font-style:italic;color:var(--cool)}
+.blk-lead{font-size:16px;line-height:1.85;color:var(--glass);max-width:680px;margin-bottom:44px}
+.blk-lead strong{color:var(--wht);font-weight:400}
+
+.tri{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{background:rgba(10,17,30,.45);border:1px solid var(--line);border-radius:3px;
+padding:28px 24px;backdrop-filter:blur(6px);transition:border-color .6s,background .6s}
+.card:hover{border-color:rgba(200,216,240,.28);background:rgba(10,17,30,.65)}
+.card-num{font-family:'Cormorant SC',serif;font-size:32px;color:rgba(200,216,240,.35);line-height:1;margin-bottom:14px}
+.card h3{font-family:'Cormorant SC',serif;font-size:20px;font-weight:400;letter-spacing:.06em;
+text-transform:uppercase;color:var(--wht);margin-bottom:12px}
+.card p{font-size:14px;line-height:1.75;color:var(--glass)}
+.card p strong{color:var(--wht);font-weight:400}
+
+.idx-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.idx{background:rgba(10,17,30,.5);border:1px solid var(--line);border-left:3px solid var(--cool);
+border-radius:3px;padding:24px 24px;transition:border-color .6s,background .6s}
+.idx:hover{border-color:rgba(200,216,240,.28);background:rgba(10,17,30,.7)}
+.idx-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;gap:12px;flex-wrap:wrap}
+.idx-name{font-family:'Cormorant SC',serif;font-size:20px;letter-spacing:.05em;text-transform:uppercase;color:var(--wht);font-weight:400}
+.idx-code{font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--cool);font-weight:400}
+.idx-q{font-size:14px;line-height:1.75;color:var(--glass);margin-bottom:14px;font-style:italic}
+.idx-q strong{color:var(--wht);font-weight:400;font-style:normal}
+.idx-desc{font-size:13.5px;line-height:1.8;color:var(--glass);margin-bottom:14px}
+.idx-desc strong{color:var(--wht);font-weight:400}
+.idx-scale{display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;line-height:1.6}
+.idx-scale .s{padding:8px 10px;border-radius:2px}
+.idx-scale .low{background:rgba(180,100,80,.08);border-left:2px solid rgba(180,100,80,.6);color:var(--glass)}
+.idx-scale .high{background:rgba(140,180,160,.08);border-left:2px solid rgba(140,180,160,.6);color:var(--glass)}
+.idx-scale .s b{display:block;font-size:8px;letter-spacing:.2em;text-transform:uppercase;font-weight:400;margin-bottom:3px}
+.idx-scale .low b{color:#D09080}
+.idx-scale .high b{color:#98C0A8}
+
+.formula-box{background:rgba(10,17,30,.55);border:1px solid var(--line);border-left:3px solid var(--cool);
+border-radius:3px;padding:32px 28px;margin-bottom:20px}
+.formula{font-family:'Cormorant SC',serif;font-size:clamp(20px,2.6vw,30px);letter-spacing:.04em;
+color:var(--wht);line-height:1.4;margin-bottom:14px}
+.formula em{font-style:italic;color:var(--cool)}
+.formula-note{font-size:13px;color:var(--dim);line-height:1.7}
+.example{background:rgba(10,17,30,.35);border:1px solid var(--line);border-radius:3px;padding:24px 28px;margin-bottom:16px}
+.example p{font-size:14.5px;line-height:1.8;color:var(--glass);margin-bottom:12px}
+.example p:last-child{margin-bottom:0}
+.example strong{color:var(--wht);font-weight:400}
+.example .big{font-family:'Cormorant SC',serif;font-size:26px;color:var(--wht);letter-spacing:.03em}
+.example-hint{font-size:13px;line-height:1.7;color:var(--dim);font-style:italic;max-width:640px}
+
+.cycle{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:24px}
+.cycle span{font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--cool);
+border:1px solid rgba(200,216,240,.28);border-radius:20px;padding:8px 16px}
+.cycle i{color:var(--dim);font-style:normal;font-size:12px}
+.cycle-note{font-size:14.5px;line-height:1.8;color:var(--glass);max-width:660px}
+.cycle-note strong{color:var(--wht);font-weight:400}
+
+.foot{border-top:1px solid var(--line);padding:32px 8vw;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.foot span{font-size:9px;letter-spacing:.4em;text-transform:uppercase;color:var(--gray)}
+
+@media(max-width:900px){
+  .nav{padding:20px 24px}.nav-links{gap:18px}.nav-links a{font-size:8px;letter-spacing:.25em}
+  .wrap{padding:0 24px}.hero{padding:16vh 0 6vh}
+  .lead{font-size:15px}.lead-hint{font-size:13px;margin-bottom:36px}
+  .tri{grid-template-columns:1fr;gap:14px}
+  .idx-grid{grid-template-columns:1fr;gap:12px}
+  .chip{width:120px;padding:8px 10px}.chip .val{font-size:16px}
+  .chip-tl{top:60px;left:12px}.chip-tr{top:60px;right:12px}
+  .chip-bl{bottom:60px;left:12px}.chip-br{bottom:60px;right:12px}
+  .mini-chart{display:none}.side-nav{display:none}
+  .sphere{width:120px;height:120px}.sphere-value{font-size:32px}
+  .formula-box,.example{padding:24px 20px}
+  .idx-scale{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body class="page">
+<canvas class="bg-canvas" id="bgCanvas"></canvas>
+
+<nav class="nav">
+  <a href="index.html" class="nav-logo">HTDC</a>
+  <div class="nav-links">
+    <a href="index.html">Главная</a>
+    <a href="method.html">Метод</a>
+    <a href="plasma.html" class="active">Plasma</a>
+    <a href="contact.html">Контакт</a>
+  </div>
+</nav>
+
+<header class="hero wrap">
+  <div class="eyebrow">V7 · Plasma · Что это</div>
+  <h1>Один экран. <em>Вся картина компании</em></h1>
+  <p class="lead">
+    Plasma — это экран, на котором компания видна целиком. Не отдел, не цех, не отчёт за квартал.
+    Четыре индекса — и одна цифра, которая собирает их вместе. По ним видно, где компания работает в полную силу,
+    а где решения буксуют.
+  </p>
+  <p class="lead-hint">
+    Ниже — тот же экран, что вы увидите на данных реальной компании. Сначала просто посмотрите на него.
+    Потом — разберём, что каждый элемент значит и зачем он нужен.
+  </p>
+
+  <div class="mock">
+    <div class="mock-top">
+      <div class="mock-brand">V7 PLASMA<span>ООО «ОМЕГА ПРОМСЕРВИС»</span></div>
+      <div class="mock-date">Живая история · 3 июля 2026</div>
+    </div>
+
+    <div class="chip chip-tl">
+      <div class="lbl">Фокус · ИФ</div>
+      <div class="val">75<small>%</small></div>
+      <div class="bar"><i style="width:75%;background:linear-gradient(to right,#F0A02880,#F0A028)"></i></div>
+    </div>
+    <div class="chip chip-tr">
+      <div class="lbl">Миссия · РМ</div>
+      <div class="val">58<small>%</small></div>
+      <div class="bar"><i style="width:58%;background:linear-gradient(to right,#D0602080,#D06020)"></i></div>
+    </div>
+    <div class="chip chip-bl">
+      <div class="lbl">Суверенитет · КС</div>
+      <div class="val">42<small>%</small></div>
+      <div class="bar"><i style="width:42%;background:linear-gradient(to right,#F5B83880,#F5B838)"></i></div>
+    </div>
+    <div class="chip chip-br">
+      <div class="lbl">Диссонанс · Д</div>
+      <div class="val">28<small>%</small></div>
+      <div class="bar"><i style="width:28%;background:linear-gradient(to right,#8B1A1A80,#8B1A1A)"></i></div>
+    </div>
+
+    <div class="mini-chart">
+      <div class="t">Динамика · Янв — Июл 2026</div>
+      <svg viewBox="0 0 180 70" preserveAspectRatio="none">
+        <polyline points="0,62 15,58 30,54 45,48 60,42 75,36 90,31 105,26 120,21 135,17 150,13 165,10 180,7"
+          fill="none" stroke="#D4AF37" stroke-width="1.2" opacity=".85"/>
+        <circle cx="0" cy="62" r="2" fill="#D4AF37"/>
+        <circle cx="90" cy="31" r="2" fill="#D4AF37"/>
+        <circle cx="180" cy="7" r="2" fill="#D4AF37"/>
+      </svg>
+      <div class="mini-months"><span>ЯНВ</span><span>МАР</span><span>МАЙ</span><span>ИЮЛ</span></div>
+    </div>
+
+    <div class="side-nav">
+      <div class="side-btn">Диссонанс</div>
+      <div class="side-btn on">Эксперимент</div>
+      <div class="side-btn">Роли</div>
+      <div class="side-btn">Обучение</div>
+    </div>
+
+    <div class="sphere-wrap">
+      <div class="sphere"></div>
+      <div class="sphere-label">Индекс состояния · ИРК</div>
+      <div class="sphere-value">52</div>
+    </div>
+  </div>
+</header>
+
+<section class="blk wrap">
+  <div class="blk-eyebrow">Зачем это нужно</div>
+  <h2>Понять, <em>что происходит</em> — до того, как решать</h2>
+  <p class="blk-lead">
+    Руководитель обычно видит цифры: выручку, план, сроки. Но не видит, <strong>почему</strong> цифры такие.
+    Plasma показывает именно это: где компания работает в полную силу, а где время и люди уходят
+    на внутренние согласования и повторную работу. Не чтобы «оценить», а чтобы понять, куда смотреть.
+  </p>
+
+  <div class="tri">
+    <div class="card">
+      <div class="card-num">01</div>
+      <h3>Сейчас</h3>
+      <p>Сфера в центре — это <strong>одна цифра</strong> (ИРК), которая собирает четыре индекса вместе. По ней видно, насколько компания использует свои возможности прямо сейчас.</p>
+    </div>
+    <div class="card">
+      <div class="card-num">02</div>
+      <h3>Раньше</h3>
+      <p>График слева — это <strong>история</strong>. Видно, как менялось состояние месяц за месяцем и на что компания реагировала.</p>
+    </div>
+    <div class="card">
+      <div class="card-num">03</div>
+      <h3>Дальше</h3>
+      <p>Вкладки справа — это <strong>слои</strong>, в которые можно провалиться: диссонанс, эксперимент, роли, обучение. С каждого экрана видно, что делать дальше.</p>
+    </div>
+  </div>
+</section>
+
+<section class="blk wrap">
+  <div class="blk-eyebrow">Из чего состоит</div>
+  <h2>Четыре индекса. <em>Четыре вопроса</em></h2>
+  <p class="blk-lead">
+    Каждый индекс отвечает на свой вопрос. Вместе они показывают, что происходит с компанией — не по отдельности, а как система.
+    Название — строгое, из методологии. Под ним — то, что за ним стоит в жизни.
+  </p>
+
+  <div class="idx-grid">
+
+    <div class="idx">
+      <div class="idx-head">
+        <div class="idx-name">Фокус</div>
+        <div class="idx-code">ИФ · концентрация</div>
+      </div>
+      <p class="idx-q"><strong>Простыми словами:</strong> куда на самом деле уходит внимание компании.</p>
+      <p class="idx-desc">
+        Это не то, что написано в стратегии, а то, на что люди реально тратят силы и время.
+        Высокий фокус — это когда <strong>много действий дают много результата</strong>: усилия сходятся в одну точку, и это видно по цифрам.
+        Низкий — когда <strong>много действий, а результата мало</strong>: все заняты, все устали, а двигается немногое.
+      </p>
+      <div class="idx-scale">
+        <div class="s low"><b>Низко · размазано</b>Действий много, результата мало. Все заняты, но движение в разные стороны</div>
+        <div class="s high"><b>Высоко · сконцентрировано</b>Действий немного, результата много. Усилия складываются</div>
+      </div>
+    </div>
+
+    <div class="idx">
+      <div class="idx-head">
+        <div class="idx-name">Суверенитет</div>
+        <div class="idx-code">КС · воля</div>
+      </div>
+      <p class="idx-q"><strong>Простыми словами:</strong> компания решает по своим интересам — или оглядывается на других.</p>
+      <p class="idx-desc">
+        Это про то, откуда берутся решения. Высокий суверенитет — это <strong>воля</strong>: компания принимает решения
+        из собственной логики и своих интересов. Не «а что скажут», не «а как у конкурентов», не «лишь бы не выделяться».
+        Низкий — когда решения принимаются <strong>из оглядки</strong>: чтобы понравиться, чтобы не выделяться,
+        чтобы соответствовать ожиданиям. Тогда компания делает не то, что правильно для неё, а то, что кажется безопасным.
+      </p>
+      <div class="idx-scale">
+        <div class="s low"><b>Низко · оглядка</b>Решения «как у всех», из страха выделиться или не понравиться</div>
+        <div class="s high"><b>Высоко · воля</b>Решения из своих интересов и своей логики</div>
+      </div>
+    </div>
+
+    <div class="idx">
+      <div class="idx-head">
+        <div class="idx-name">Миссия</div>
+        <div class="idx-code">РМ · смысл</div>
+      </div>
+      <p class="idx-q"><strong>Простыми словами:</strong> есть ли у людей смысл, за который они держатся.</p>
+      <p class="idx-desc">
+        Это не слоган на стене. Это <strong>смысл работы</strong> — ответ на вопрос «зачем мы это делаем».
+        Высокая миссия даёт <strong>вдохновение и энтузиазм</strong>: люди прикладывают максимум усилий — и сами,
+        и вместе с командой, — потому что понимают, ради чего. Низкая миссия — когда работают «потому что надо»:
+        делают ровно минимум, инициативы нет, и каждый новый день похож на предыдущий.
+      </p>
+      <div class="idx-scale">
+        <div class="s low"><b>Низко · нет смысла</b>Работа по привычке, «потому что надо». Делают ровно минимум</div>
+        <div class="s high"><b>Высоко · есть смысл</b>Вдохновение и энтузиазм. Максимум усилий — и личных, и общих</div>
+      </div>
+    </div>
+
+    <div class="idx">
+      <div class="idx-head">
+        <div class="idx-name">Диссонанс</div>
+        <div class="idx-code">Д · сомнения</div>
+      </div>
+      <p class="idx-q"><strong>Простыми словами:</strong> насколько решения буксуют из-за внутренних противоречий.</p>
+      <p class="idx-desc">
+        Диссонанс — это <strong>сомнения, которые не дают двигаться</strong>. Когда их слишком много, это выглядит так:
+        бесконечные переговоры ни о чём, длинные рассуждения вместо действия, страх сделать шаг. Внутри компании
+        сталкиваются разные картины мира: стратегия спорит с тактикой, личные интересы — с командными. Решение
+        известно, но принять его не могут месяцами.
+        <br><br>
+        <strong>Разумное сомнение</strong> — другое. Оно помогает: всё проверяется логично, взвешенно, понятно.
+        И когда картина сходится — решение принимается быстро и доводится до конца. Это <strong>низкий диссонанс</strong>:
+        не «нет сомнений», а «сомнения рабочие».
+      </p>
+      <div class="idx-scale">
+        <div class="s low"><b>Низко · рабочие сомнения</b>Всё проверяется логично, решение принимается быстро и доводится до конца</div>
+        <div class="s high"><b>Высоко · стопор</b>Переговоры ни о чём, страх шага, стратегия спорит с тактикой, личное — с командным</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="blk wrap">
+  <div class="blk-eyebrow">Что это значит в деньгах</div>
+  <h2>Цифра, которую видно <em>в рублях</em></h2>
+  <p class="blk-lead">
+    Индексы — это не абстракция. За каждым стоит простая вещь: компания платит за 100% возможностей человека,
+    а получает только часть. Разницу можно посчитать.
+  </p>
+
+  <div class="formula-box">
+    <div class="formula">Потеря = (1 − <em>ИРК</em>) × Вложение</div>
+    <div class="formula-note">Вложение — это зарплата человека плюс то, что компания вкладывает в него: обучение, инструменты, время руководителей.</div>
+  </div>
+
+  <div class="example">
+    <p>Сотрудник получает <strong>200 000 ₽</strong> в месяц. ИРК компании — <strong>52%</strong>.</p>
+    <p>Потеря = (1 − 0,52) × 200 000 = <span class="big">96 000 ₽ в месяц</span>.</p>
+    <p>Это не бухгалтерский убыток. Это разница между тем, что компания платит, и тем, что она получает по факту.</p>
+  </div>
+
+  <p class="example-hint">
+    Число 52% — это пример. У каждой компании свой ИРК. Plasma показывает его на данных самой компании,
+    а не берёт «среднее по рынку».
+  </p>
+</section>
+
+<section class="blk wrap">
+  <div class="blk-eyebrow">Как это работает</div>
+  <h2>Не просто «показывает». <em>Помогает проверить</em></h2>
+  <p class="blk-lead">
+    Plasma — не фотография. Это рабочий инструмент: посмотрели на экран, сформулировали гипотезу,
+    проверили её небольшим шагом, посмотрели, что изменилось. И так по кругу.
+  </p>
+
+  <div class="cycle">
+    <span>Смотрим</span><i>→</i>
+    <span>Предполагаем</span><i>→</i>
+    <span>Пробуем</span><i>→</i>
+    <span>Смотрим результат</span><i>→</i>
+    <span>Корректируем</span>
+  </div>
+
+  <p class="cycle-note">
+    Один шаг — это <strong>от 3 до 21 дня</strong>. Короткий Нано-Шлюз — 3–7 дней: проверить одну простую гипотезу.
+    Полный Шлюз — до 21 дня: закрепить изменение. <strong>84 дня</strong> — четыре таких периода — чтобы увидеть,
+    держится ли результат на длинной дистанции. Plasma не обещает результата. Она показывает, что произошло на самом деле.
+  </p>
+</section>
+
+<footer class="foot">
+  <span>HTDC · V7 Plasma</span>
+  <span>MMXXVI</span>
+</footer>
+
+<script>
+(function(){
+  const canvas = document.getElementById('bgCanvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  function resize(){ W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+  resize(); addEventListener('resize', resize);
+
+  let time = 0;
+  const particles = [];
+  const PARTICLE_COUNT = 70;
+  const focus = { x: 0.88, y: 0.78 };
+  const CORE_OPACITY = 0.30;
+  const mouse = { x:0, y:0, tx:0, ty:0 };
+  addEventListener('mousemove', (e)=>{
+    mouse.tx = (e.clientX / innerWidth - 0.5) * 0.5;
+    mouse.ty = (e.clientY / innerHeight - 0.5) * 0.5;
+  });
+
+  class MistParticle{
+    constructor(){ this.reset(); }
+    reset(){
+      this.x = Math.random()*W; this.y = Math.random()*H; this.depth = Math.random();
+      const s = 0.2 + this.depth*1.5;
+      this.vx = (Math.random()-0.5)*0.08*s; this.vy = (Math.random()-0.5)*0.08*s;
+      this.size = 24 + this.depth*200; this.alpha = 0.020 - (this.depth*0.014);
+      this.phase = Math.random()*Math.PI*2; this.phaseSpeed = 0.0008 + Math.random()*0.0015;
+    }
+    update(){
+      this.x += this.vx; this.y += this.vy; this.phase += this.phaseSpeed;
+      this.x += Math.sin(this.phase + time*0.10)*0.06;
+      this.y += Math.cos(this.phase*0.6 + time*0.08)*0.06;
+      if(this.x < -this.size) this.x = W+this.size;
+      if(this.x > W+this.size) this.x = -this.size;
+      if(this.y < -this.size) this.y = H+this.size;
+      if(this.y > H+this.size) this.y = -this.size;
+    }
+    draw(){
+      const g = ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.size);
+      const a = this.alpha, r = 100 + this.depth*20, gC = 130 + this.depth*20, b = 180 + this.depth*10;
+      g.addColorStop(0, `rgba(${r},${gC},${b},${a*1.6})`);
+      g.addColorStop(0.5, `rgba(${r*0.7},${gC*0.7},${b*0.8},${a*0.6})`);
+      g.addColorStop(1, `rgba(40,55,85,0)`);
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fill();
+    }
+  }
+  for(let i=0;i<PARTICLE_COUNT;i++) particles.push(new MistParticle());
+
+  function drawCore(cx, cy, pulse){
+    const size = 360;
+    const core = ctx.createRadialGradient(cx,cy,0,cx,cy,size);
+    core.addColorStop(0, `rgba(255,255,255,${0.55*CORE_OPACITY})`);
+    core.addColorStop(0.12, `rgba(245,250,255,${(0.45+pulse*0.05)*CORE_OPACITY})`);
+    core.addColorStop(0.40, `rgba(220,235,255,${(0.18+pulse*0.03)*CORE_OPACITY})`);
+    core.addColorStop(0.75, `rgba(160,190,240,0.04)`);
+    core.addColorStop(1, `rgba(0,0,0,0)`);
+    ctx.fillStyle = core; ctx.beginPath(); ctx.arc(cx,cy,size,0,Math.PI*2); ctx.fill();
+  }
+
+  function render(){
+    time += 0.012;
+    mouse.x += (mouse.tx - mouse.x)*0.02; mouse.y += (mouse.ty - mouse.y)*0.02;
+    const bg = ctx.createRadialGradient(W*0.9,H*0.85,0,W*0.5,H*0.5,Math.max(W,H)*1.05);
+    bg.addColorStop(0,'#0A111E'); bg.addColorStop(0.5,'#050810'); bg.addColorStop(1,'#020408');
+    ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
+    const cx = W*focus.x + mouse.x*14, cy = H*focus.y + mouse.y*14;
+    const pulse = Math.sin(time*0.25)*0.5 + 0.5;
+    particles.sort((a,b)=>a.depth-b.depth);
+    particles.forEach(p=>{ p.update(); p.draw(); });
+    drawCore(cx, cy, pulse);
+    requestAnimationFrame(render);
+  }
+  render();
+  addEventListener('resize', ()=>particles.forEach(p=>p.reset()));
+})();
+</script>
+</body>
+</html>

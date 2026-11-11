@@ -1,0 +1,14 @@
+{
+  "name": "htdc-landing",
+  "private": true,
+  "description": "Лендинг HTDC. Сам сайт — чистые HTML/CSS/JS без сборки; зависимости нужны только для тестов и превью.",
+  "type": "module",
+  "scripts": {
+    "serve": "python -m http.server 8765",
+    "test": "node tools/test.mjs",
+    "previews": "node tools/previews.mjs"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^23.0.0"
+  }
+}
