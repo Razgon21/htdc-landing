@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HTDC — организационная диагностика</title>
+<title>HTDC: организационная диагностика</title>
 <meta name="description" content="Находим, где работа в компании расходится с тем, как она устроена на бумаге, и проверяем причину коротким экспериментом с замером «до» и «после».">
 <meta name="theme-color" content="#06080D">
 <meta name="color-scheme" content="dark">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2306080d'/%3E%3Ccircle cx='16' cy='16' r='10' fill='%23d6e6f5'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<a class="skip" href="#main">К содержанию</a>
+<a class="skip" href="#situations">К содержанию</a>
 
 <!-- Фон: туман (низкое разрешение) и одна сфера на всю страницу. Оба рисует main.js через WebGL -->
 <div class="backdrop" aria-hidden="true">
@@ -22,30 +22,78 @@
   <canvas class="sphere"></canvas>
 </div>
 
-<header class="nav">
+<!-- Шапка главной только прокручивает страницу. Полные страницы «Инструменты» и «История»
+     открываются из одноимённых блоков и из футера -->
+<header class="nav" data-nav>
   <a class="nav__mark" href="#top" aria-label="HTDC, в начало">HTDC</a>
-  <nav class="nav__links" aria-label="Разделы">
+  <nav class="nav__links" id="nav-links" aria-label="Разделы">
     <a href="#situations">Ситуации</a>
+    <a href="#approach">Подход</a>
     <a href="#process">Как проходит</a>
     <a href="#formats">Форматы</a>
     <a href="#showcase">Инструменты</a>
+    <a href="#history">История</a>
     <a href="#faq">Вопросы</a>
   </nav>
-  <a class="btn btn--small" href="#contact">Обсудить диагностику</a>
+  <a class="btn btn--small nav__cta" href="#contact">Обсудить<span class="nav__more">&nbsp;диагностику</span></a>
+  <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links"><span class="sr-only">Меню</span></button>
 </header>
 
 <main id="main">
 
-  <section class="hero" id="top" data-fog="0.9">
-    <div class="hero__text">
-      <h1 class="hero__title">На бумаге всё сходится</h1>
-      <p class="hero__lead">Организационная диагностика для компаний на 50–300 человек. Находим, где работа расходится с тем, как она устроена, и проверяем причину трёхнедельным экспериментом с замером «до» и «после».</p>
-      <div class="hero__actions">
-        <a class="btn" href="#contact">Обсудить диагностику</a>
-        <a class="link" href="#showcase-instructions">Посмотреть пример инструкции</a>
+  <!-- Вступление: четыре экрана. С движением они закреплены и сменяются по прокрутке,
+       сами листаются, пока посетитель ничего не трогает. data-hold: сколько секунд слайд ждёт -->
+  <section class="intro" id="top" data-intro aria-label="Вступление" data-fog="0.9" style="--n: 4">
+    <div class="intro__stage">
+
+      <article class="slide slide--unknown" data-slide data-hold="10">
+        <div class="slide__text">
+          <h1 class="slide__title">Вы тоже чувствуете, что вашим бизнесом управляет <em><span class="nb">что-то</span> неведомое</em>?</h1>
+          <p class="slide__lead">Решение принято, все согласились, а через месяц ничего не изменилось. Поручения розданы, результата нет. Совещания идут, проблема остаётся. Люди меняются, картина та же. <span class="nb">Что-то</span> невидимое управляет результатом. Мы называем это <strong>неведомым</strong>, пока не поймём, откуда оно берётся.</p>
+        </div>
+        <div class="slide__orb" data-anchor="unknown" aria-hidden="true"></div>
+      </article>
+
+      <article class="slide slide--factor" data-slide data-hold="13">
+        <div class="slide__text">
+          <h2 class="slide__title">Человеческий фактор</h2>
+          <p class="slide__lead">То, что вы чувствуете, обычно называют <strong>человеческим фактором</strong>. Ошибки, саботаж, медлительность. Разные версии одного решения у разных отделов. Информация, которая теряется при передаче. Так это выглядит, когда смотришь на людей. Но за словами «человеческий фактор» чаще стоит не характер, а <strong>коммуникации между отделами</strong>: то, как информация движется внутри компании. Именно это анализируют по рабочим чатам и переписке.</p>
+        </div>
+        <div class="slide__orb" data-anchor="factor" aria-hidden="true"></div>
+      </article>
+
+      <article class="slide slide--source" data-slide data-hold="13">
+        <div class="slide__text">
+          <h2 class="slide__title">Человеческий фактор не проблема. Это <em>ресурс</em></h2>
+          <p class="slide__lead">Мы обучили <strong>ИИ-агента</strong> на своей методологии: он читает транскрипты совещаний, рабочие чаты и карты поведения людей, находит <strong>противоречия в коммуникациях</strong> и меняет вопрос с «кто виноват» на «где правило перестало работать». Человеческий фактор перестаёт быть проблемой, которую надо подавить. Он становится <strong>энергией, которую можно направить</strong>.</p>
+          <p class="slide__actions"><a class="link" href="#process">Как это работает</a></p>
+        </div>
+        <div class="slide__orb" data-anchor="source" aria-hidden="true"></div>
+      </article>
+
+      <article class="slide slide--offer" data-slide>
+        <div class="slide__orb" data-anchor="pearl" aria-hidden="true"></div>
+        <div class="slide__text">
+          <h2 class="slide__title">Организационная диагностика</h2>
+          <p class="slide__lead">Для компаний на 50–300 человек. Находим, где работа расходится с тем, как она устроена на бумаге, и проверяем причину трёхнедельным экспериментом с замером «до» и «после».</p>
+          <div class="slide__actions">
+            <a class="btn" href="#contact">Обсудить диагностику</a>
+            <a class="link" href="tools.html#instructions">Посмотреть пример инструкции</a>
+          </div>
+        </div>
+      </article>
+
+      <div class="intro__ui" data-intro-ui>
+        <div class="intro__dots" role="group" aria-label="Экраны вступления">
+          <button class="dot" type="button" data-go="0" aria-label="Экран 1: неведомое"></button>
+          <button class="dot" type="button" data-go="1" aria-label="Экран 2: человеческий фактор"></button>
+          <button class="dot" type="button" data-go="2" aria-label="Экран 3: ресурс"></button>
+          <button class="dot" type="button" data-go="3" aria-label="Экран 4: организационная диагностика"></button>
+        </div>
+        <button class="intro__play" type="button" data-play aria-label="Остановить автолистание"></button>
+        <button class="intro__next" type="button" data-next>Дальше</button>
       </div>
     </div>
-    <div class="hero__orb" data-anchor="pearl" aria-hidden="true"></div>
   </section>
 
   <section class="situations" id="situations" aria-labelledby="situations-title" data-fog="1.1">
@@ -114,17 +162,42 @@
     </div>
   </section>
 
-  <section class="field not" id="approach" aria-labelledby="not-title" data-fog="0.3">
+  <!-- Подход: четыре правила. Сфера-указатель стоит у строки, которая сейчас в центре экрана -->
+  <section class="rules" id="approach" aria-labelledby="rules-title" data-fog="0.55">
     <div class="split head">
-      <h2 id="not-title" class="h2">Чем диагностика не является</h2>
-      <p class="lead">Мы не оцениваем людей и ничего не внедряем. Мы смотрим на правила, в которых работает компания, и на то, как люди их обходят.</p>
+      <h2 id="rules-title" class="h2">На чём держится наша работа</h2>
+      <p class="lead">Мы смотрим на правила, в которых работает компания, и на то, как люди их обходят. Отсюда четыре принципа, которые делают диагностику безопасной для команды и понятной для вас.</p>
     </div>
-    <ul class="not__rows" role="list">
-      <li class="split"><h3 class="term">Не тест личности</h3><p>Мы не раскладываем людей по типам и не вешаем ярлыков. Нас интересует не характер сотрудника, а то, что ему выгодно и что опасно в его работе.</p></li>
-      <li class="split"><h3 class="term">Не тренинг</h3><p>Учить людей бессмысленно, пока не ясно, что им мешает. Сначала причина, потом решение.</p></li>
-      <li class="split"><h3 class="term">Не программа</h3><p>Ничего не нужно внедрять и настраивать. На выходе документ и проверенный результат.</p></li>
-      <li class="split"><h3 class="term">Не поиск виноватых</h3><p>Высказывания сотрудников обезличены. Фамилии в отчёт не попадают.</p></li>
-    </ul>
+    <ol class="guide" role="list">
+      <li class="split guide__row" data-guide>
+        <div class="guide__head">
+          <span class="guide__slot" data-anchor="guide" aria-hidden="true"></span>
+          <h3 class="term">Смотрим на правила, а не на людей</h3>
+        </div>
+        <p>Нас интересует не характер сотрудника, а то, что ему выгодно и что опасно в его работе. Поэтому людей мы не раскладываем по типам и обходимся без ярлыков.</p>
+      </li>
+      <li class="split guide__row" data-guide>
+        <div class="guide__head">
+          <span class="guide__slot" data-anchor="guide" aria-hidden="true"></span>
+          <h3 class="term">Сначала причина, потом решение</h3>
+        </div>
+        <p>Учить людей бессмысленно, пока не ясно, что им мешает. Мы находим причину, проверяем её на деле, и только потом вы решаете, что менять.</p>
+      </li>
+      <li class="split guide__row" data-guide>
+        <div class="guide__head">
+          <span class="guide__slot" data-anchor="guide" aria-hidden="true"></span>
+          <h3 class="term">На выходе документ и замер</h3>
+        </div>
+        <p>Ничего не нужно внедрять и настраивать. Вы получаете карту разрывов и результат, проверенный экспериментом.</p>
+      </li>
+      <li class="split guide__row" data-guide>
+        <div class="guide__head">
+          <span class="guide__slot" data-anchor="guide" aria-hidden="true"></span>
+          <h3 class="term">Слова остаются без имён</h3>
+        </div>
+        <p>Высказывания сотрудников обезличены. Фамилии в отчёт не попадают, и руководство не узнаёт, кто что сказал.</p>
+      </li>
+    </ol>
   </section>
 
   <section class="lens" id="lens" aria-labelledby="lens-title" data-fog="0.85" data-clear="1">
@@ -132,10 +205,10 @@
     <div class="lens__stage">
       <div class="lens__orb" data-anchor="lens" aria-hidden="true"></div>
       <dl class="lens__grid">
-        <div class="lens__q lens__q--tl"><dt class="term">Решения</dt><dd>Кто на деле принимает решения и доводит их до конца, а кто только согласует.</dd></div>
-        <div class="lens__q lens__q--tr"><dt class="term">Внимание</dt><dd>На что уходит время руководителей и что остаётся без присмотра.</dd></div>
-        <div class="lens__q lens__q--bl"><dt class="term">Смысл</dt><dd>Понимают ли люди, зачем нужно правило, которое они выполняют.</dd></div>
-        <div class="lens__q lens__q--br"><dt class="term">Сомнения</dt><dd>Где люди перестраховываются, молчат или ждут команды сверху.</dd></div>
+        <div class="lens__q lens__q--tl" data-aim="-1 -1"><dt class="term">Решения</dt><dd>Кто на деле принимает решения и доводит их до конца, а кто только согласует.</dd></div>
+        <div class="lens__q lens__q--tr" data-aim="1 -1"><dt class="term">Внимание</dt><dd>На что уходит время руководителей и что остаётся без присмотра.</dd></div>
+        <div class="lens__q lens__q--bl" data-aim="-1 1"><dt class="term">Смысл</dt><dd>Понимают ли люди, зачем нужно правило, которое они выполняют.</dd></div>
+        <div class="lens__q lens__q--br" data-aim="1 1"><dt class="term">Сомнения</dt><dd>Где люди перестраховываются, молчат или ждут команды сверху.</dd></div>
       </dl>
     </div>
   </section>
@@ -152,39 +225,40 @@
         <p class="timeline__weeks"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span></p>
       </div>
     </div>
+    <!-- data-light: мягкий свет идёт по шагам и встаёт у конца полосы того шага, что сейчас на экране -->
     <ol class="steps" role="list">
       <li class="split step" style="--start:0;--len:2">
         <div class="step__left">
           <div><h3 class="step__name">Сбор картины</h3><p class="step__time"><span class="draft">1–2 недели</span></p></div>
-          <div class="step__bar"><i></i></div>
+          <div class="step__bar"><i data-light="end"></i></div>
         </div>
         <p class="step__text">Беседы с руководителями и сотрудниками, документы, регламенты и, с вашего разрешения, рабочие чаты.</p>
       </li>
       <li class="split step" style="--start:2;--len:1">
         <div class="step__left">
           <div><h3 class="step__name">Поиск расхождений</h3><p class="step__time"><span class="draft">1 неделя</span></p></div>
-          <div class="step__bar"><i></i></div>
+          <div class="step__bar"><i data-light="end"></i></div>
         </div>
-        <p class="step__text">Сравниваем, как работа устроена по правилам и как идёт на деле. Итог — карта разрывов.</p>
+        <p class="step__text">Сравниваем, как работа устроена по правилам и как идёт на деле. Итог: карта разрывов.</p>
       </li>
       <li class="split step" style="--start:3;--len:0.5">
         <div class="step__left">
           <div><h3 class="step__name">Гипотеза</h3><p class="step__time">Одна встреча</p></div>
-          <div class="step__bar"><i></i></div>
+          <div class="step__bar"><i data-light="end"></i></div>
         </div>
         <p class="step__text">Вместе с вами выбираем один разрыв и формулируем, что именно создаёт трение. Фиксируем замер «до».</p>
       </li>
       <li class="split step step--key" style="--start:3.5;--len:3.5">
         <div class="step__left">
           <div><h3 class="step__name">Эксперимент</h3><p class="step__time">Около трёх недель</p></div>
-          <div class="step__bar"><i></i></div>
+          <div class="step__bar"><i data-light="end"></i></div>
         </div>
         <p class="step__text">Меняем одно правило на ограниченном участке. Если что-то пойдёт не так, его легко вернуть.</p>
       </li>
       <li class="split step" style="--start:7;--len:1">
         <div class="step__left">
           <div><h3 class="step__name">Замер «после»</h3><p class="step__time"><span class="draft">1 неделя</span></p></div>
-          <div class="step__bar"><i></i></div>
+          <div class="step__bar"><i data-light="end"></i></div>
         </div>
         <p class="step__text">Сравниваем с «до» и решаем вместе: распространять изменение, доработать или отказаться.</p>
       </li>
@@ -232,7 +306,7 @@
       </li>
       <li>
         <h3 class="case__step">Что проверили</h3>
-        <p>Три недели одна группа продавцов согласовывала срок с мастером цеха до подписания. Премию не трогали — поменяли только порядок.</p>
+        <p>Три недели одна группа продавцов согласовывала срок с мастером цеха до подписания. Премию не трогали, поменяли только порядок.</p>
       </li>
       <li>
         <h3 class="case__step">Что показал замер</h3>
@@ -245,6 +319,7 @@
     <h2 id="formats-title" class="h2">С чего можно начать</h2>
     <div class="split formats__grid">
       <article class="offer offer--main" aria-labelledby="offer-1">
+        <span class="offer__light" data-light aria-hidden="true"></span>
         <h3 id="offer-1" class="offer__title">Диагностика компании</h3>
         <p class="lead">Основной формат. Для собственника, которому нужно понять, что мешает компании, и проверить это на деле.</p>
         <dl class="facts">
@@ -258,94 +333,70 @@
         <h3 id="offer-2" class="offer__title">Управленческая инструкция</h3>
         <p class="lead">Лёгкий вход. Документ о том, как работать с одним конкретным человеком: кандидатом, новым сотрудником или руководителем.</p>
         <dl class="facts">
-          <div><dt>Что получаете</dt><dd>Инструкцию на пяти страницах и <span class="draft">встречу с разбором</span></dd></div>
+          <div><dt>Что получаете</dt><dd>Инструкцию на нескольких листах и <span class="draft">встречу с разбором</span></dd></div>
           <div><dt>Срок</dt><dd><span class="draft">несколько рабочих дней</span></dd></div>
           <div><dt>Стоимость</dt><dd><span class="draft">от 60 000 ₽</span></dd></div>
         </dl>
         <div class="offer__actions">
-          <a class="btn btn--quiet" href="#showcase-instructions">Посмотреть примеры</a>
+          <a class="btn btn--quiet" href="tools.html#instructions">Посмотреть примеры</a>
           <a class="link" href="#contact" data-format="Управленческая инструкция">Заказать инструкцию</a>
         </div>
       </article>
     </div>
   </section>
 
+  <!-- Инструменты: короткий блок. Полные описания и все примеры живут на tools.html -->
   <section class="showcase" id="showcase" aria-labelledby="showcase-title" data-fog="0.7">
     <div class="split head">
       <h2 id="showcase-title" class="h2">Что ещё мы делаем</h2>
-      <p class="lead">Диагностика — основной продукт. Рядом с ней есть инструменты, которые <span class="draft">можно заказать отдельно</span>. У каждого есть демонстрационный пример: откройте и посмотрите, как это выглядит на деле.</p>
+      <p class="lead">Диагностика остаётся основным продуктом. Рядом с ней есть инструменты, которые <span class="draft">можно заказать отдельно</span>. У каждого есть демонстрационный пример: откройте и посмотрите, как это выглядит на деле.</p>
     </div>
+    <ul class="sheets sheets--tools" role="list">
+      <li>
+        <a class="sheet" href="tools.html#instructions">
+          <span class="sheet__frame"><img src="showcase/previews/instr-entry.webp" width="1123" height="794" alt="" loading="lazy" decoding="async"></span>
+          <span class="sheet__name">Управленческая инструкция</span>
+          <span class="sheet__meta">Как работать с конкретным человеком: что его включает, где он споткнётся и что руководителю сделать уже завтра.</span>
+          <span class="sheet__open">Три примера</span>
+        </a>
+      </li>
+      <li>
+        <a class="sheet" href="tools.html#plasma">
+          <span class="sheet__frame"><img src="showcase/previews/plasma.webp" width="1123" height="794" alt="" loading="lazy" decoding="async"></span>
+          <span class="sheet__name">Plasma: экран состояния компании</span>
+          <span class="sheet__meta">Один экран, на котором компания видна целиком: где она работает в полную силу, а где время уходит на согласования.</span>
+          <span class="sheet__open">Пример экрана</span>
+        </a>
+      </li>
+      <li>
+        <a class="sheet" href="tools.html#avatar">
+          <span class="sheet__frame"><img src="showcase/previews/avatar.webp" width="1123" height="794" alt="" loading="lazy" decoding="async"></span>
+          <span class="sheet__name">Аватар компании</span>
+          <span class="sheet__meta">Живая модель: производство, финансы, продажи и люди собраны в одну картину, на которой видно узкое место.</span>
+          <span class="sheet__open">Пример модели</span>
+        </a>
+      </li>
+    </ul>
+    <p class="showcase__all"><a class="btn btn--quiet" href="tools.html">Все инструменты и примеры</a></p>
+  </section>
 
-    <article class="exhibit" id="showcase-instructions" aria-labelledby="ex-1">
-      <div class="split exhibit__text">
-        <h3 id="ex-1" class="exhibit__title">Управленческая инструкция</h3>
-        <div>
-          <p>Документ о том, как работать с конкретным человеком: что его включает, в чём он силён, где споткнётся и что руководителю сделать уже завтра. Это карта, а не оценка. Она отвечает не на вопрос «какой он», а на вопрос «что с этим делать».</p>
-          <dl class="facts facts--row">
-            <div><dt>Для кого</dt><dd>HR, прямой руководитель, собственник</dd></div>
-            <div><dt>Основа</dt><dd>Короткий опрос сотрудника, от 5 до 20 минут</dd></div>
-          </dl>
-        </div>
+  <!-- История: короткий блок. Полная хроника живёт на history.html -->
+  <section class="past" id="history" aria-labelledby="past-title" data-fog="0.5">
+    <div class="split head">
+      <h2 id="past-title" class="h2">23 года поиска. Один инструмент</h2>
+      <div>
+        <p class="lead">С 2003 года мы ищем способы увидеть скрытые процессы в организациях: то, чего нет в стандартных отчётах, но что определяет работу всей системы.</p>
+        <p class="past__more"><a class="btn btn--quiet" href="history.html">Читать историю подхода</a></p>
       </div>
-      <ul class="sheets" role="list">
-        <li>
-          <a class="sheet" href="example.html?doc=instr-entry">
-            <span class="sheet__frame"><img src="showcase/previews/instr-entry.webp" width="1123" height="905" alt="" loading="lazy" decoding="async"></span>
-            <span class="sheet__name">На входе</span>
-            <span class="sheet__meta">Кандидат, до найма · 12 вопросов, 5 минут</span>
-            <span class="sheet__open">Открыть пример</span>
-          </a>
-        </li>
-        <li>
-          <a class="sheet" href="example.html?doc=instr-probation">
-            <span class="sheet__frame"><img src="showcase/previews/instr-probation.webp" width="1123" height="905" alt="" loading="lazy" decoding="async"></span>
-            <span class="sheet__name">После испытательного срока</span>
-            <span class="sheet__meta">Через 1–3 месяца · 30 вопросов, 15 минут</span>
-            <span class="sheet__open">Открыть пример</span>
-          </a>
-        </li>
-        <li>
-          <a class="sheet" href="example.html?doc=instr-veteran">
-            <span class="sheet__frame"><img src="showcase/previews/instr-veteran.webp" width="1123" height="905" alt="" loading="lazy" decoding="async"></span>
-            <span class="sheet__name">Для давних сотрудников</span>
-            <span class="sheet__meta">Тем, кто уже работает · 42 вопроса, 20 минут</span>
-            <span class="sheet__open">Открыть пример</span>
-          </a>
-        </li>
-      </ul>
-    </article>
-
-    <article class="split exhibit exhibit--screen" aria-labelledby="ex-2">
-      <div class="exhibit__copy">
-        <h3 id="ex-2" class="exhibit__title">Plasma: экран состояния компании</h3>
-        <p>Один экран, на котором компания видна целиком: не отдел, не цех и не отчёт за квартал. По нему видно, где компания работает в полную силу, а где время и люди уходят на согласования и повторную работу, и как это менялось месяц за месяцем.</p>
-        <dl class="facts">
-          <div><dt>Для кого</dt><dd>Собственник и команда руководителей</dd></div>
-          <div><dt>Когда нужен</dt><dd>Когда цифры в отчётах есть, а почему они такие — непонятно</dd></div>
-        </dl>
-      </div>
-      <a class="sheet sheet--wide" href="example.html?doc=plasma">
-        <span class="sheet__frame"><img src="showcase/previews/plasma.webp" width="1080" height="608" alt="" loading="lazy" decoding="async"></span>
-        <span class="sheet__name">Экран на демонстрационных данных</span>
-        <span class="sheet__open">Открыть пример</span>
-      </a>
-    </article>
-
-    <article class="split exhibit exhibit--model" aria-labelledby="ex-3">
-      <a class="sheet sheet--wide" href="example.html?doc=avatar">
-        <span class="sheet__frame"><img src="showcase/previews/avatar.webp" width="1280" height="800" alt="" loading="lazy" decoding="async"></span>
-        <span class="sheet__name">Модель на демонстрационных данных</span>
-        <span class="sheet__open">Открыть пример</span>
-      </a>
-      <div class="exhibit__copy">
-        <h3 id="ex-3" class="exhibit__title">Аватар компании</h3>
-        <p>Живая модель компании. Производство, финансы, продажи и люди обычно живут в разных папках, а здесь они собраны в одну картину. На ней видно узкое место, и решение можно проверить на модели до того, как его принять.</p>
-        <dl class="facts">
-          <div><dt>Для кого</dt><dd>Собственник и директора направлений</dd></div>
-          <div><dt>Когда нужен</dt><dd>Когда исправление в одном отделе ломает что-то в соседнем</dd></div>
-        </dl>
-      </div>
-    </article>
+    </div>
+    <ol class="past__axis" role="list">
+      <li><a href="history.html#y2003"><span class="past__years">2003–2007</span><span class="past__what">Карта социальных разрывов</span></a></li>
+      <li><a href="history.html#y2007"><span class="past__years">2007–2011</span><span class="past__what">Поиск устаревших правил</span></a></li>
+      <li><a href="history.html#y2011"><span class="past__years">2011–2015</span><span class="past__what">Профиль руководителя</span></a></li>
+      <li><a href="history.html#y2015"><span class="past__years">2015–2019</span><span class="past__what">Модель связности</span></a></li>
+      <li><a href="history.html#y2019"><span class="past__years">2019–2023</span><span class="past__what">Общий язык для четырёх инструментов</span></a></li>
+      <li class="past__now"><a href="history.html#y2023"><span class="past__years">2023–2026</span><span class="past__what">Управление человеческим фактором</span></a><span class="past__slot" data-anchor="guide" aria-hidden="true"></span></li>
+    </ol>
   </section>
 
   <section class="field faq" id="faq" aria-labelledby="faq-title" data-fog="0.3">
@@ -357,11 +408,11 @@
       <div class="faq__list">
         <details>
           <summary>Чем это отличается от обычного консалтинга?</summary>
-          <p>Мы не приносим готовых рецептов и не пишем стратегию. Мы находим одно конкретное место, где работа идёт не так, как задумано, и проверяем причину небольшим экспериментом. Решение о дальнейших изменениях остаётся за вами — уже на основе замера.</p>
+          <p>Мы не приносим готовых рецептов и не пишем стратегию. Мы находим одно конкретное место, где работа идёт не так, как задумано, и проверяем причину небольшим экспериментом. Решение о дальнейших изменениях остаётся за вами, уже на основе замера.</p>
         </details>
         <details>
           <summary>Сколько это стоит?</summary>
-          <p>Диагностика компании — <span class="draft">от 450 000 ₽</span>, управленческая инструкция — <span class="draft">от 60 000 ₽</span>. Точная сумма зависит от размера компании и числа бесед; её мы называем после первой встречи.</p>
+          <p>Диагностика компании стоит <span class="draft">от 450 000 ₽</span>, управленческая инструкция <span class="draft">от 60 000 ₽</span>. Точная сумма зависит от размера компании и числа бесед; её мы называем после первой встречи.</p>
         </details>
         <details>
           <summary>Сколько потребуется моего времени?</summary>
@@ -420,7 +471,7 @@
           <label><input type="radio" name="format" value="Пока не знаю"> Пока не знаю, хочу обсудить</label>
         </fieldset>
         <div class="form__row">
-          <label for="f-message">Что происходит в компании <span class="form__opt">— по желанию</span></label>
+          <label for="f-message">Что происходит в компании <span class="form__opt">(по желанию)</span></label>
           <textarea id="f-message" name="message" rows="4"></textarea>
         </div>
         <div class="form__row form__consent">
@@ -437,13 +488,17 @@
 
 <footer class="footer">
   <p class="footer__mark" aria-hidden="true">HTDC</p>
+  <nav class="footer__nav" aria-label="Страницы сайта">
+    <a class="link" href="tools.html">Инструменты и примеры</a>
+    <a class="link" href="history.html">История подхода</a>
+    <a class="link" href="policy.html">Политика конфиденциальности</a>
+  </nav>
   <div class="footer__row">
     <p>Human Technology &amp; Development Center. Организационная диагностика.</p>
     <p><a class="link" href="mailto:hello@htdc.example"><span class="draft">hello@htdc.example</span></a></p>
-    <p><a class="link" href="policy.html">Политика конфиденциальности</a></p>
     <p>© 2026</p>
   </div>
-  <p class="footer__proto">Прототип. Места, подчёркнутые пунктиром, — черновые данные для согласования.</p>
+  <p class="footer__proto">Прототип. Пунктиром подчёркнуты черновые данные для согласования.</p>
 </footer>
 
 <script src="main.js" defer></script>

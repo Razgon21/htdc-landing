@@ -13,36 +13,55 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /* ================= Статика ================= */
 console.log("\nСтатика");
+const PAGES = ["index.html", "tools.html", "history.html"];
 const html = read("index.html");
+const pages = Object.fromEntries([...PAGES, "example.html", "policy.html"].map((f) => [f, read(f)]));
+const idsOf = (src) => [...src.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]);
+const textOf = (src) => src.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<!--[\s\S]*?-->/g, "").replace(/<[^>]+>/g, " ");
 
 {
-  const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]);
-  const dup = ids.filter((id, i) => ids.indexOf(id) !== i);
-  ok("id на странице не повторяются", dup.length === 0, dup.join(", "));
-
-  const anchors = [...html.matchAll(/href="#([^"]+)"/g)].map((m) => m[1]);
-  const dead = [...new Set(anchors.filter((a) => !ids.includes(a)))];
-  ok("все якорные ссылки ведут на существующие блоки", dead.length === 0, dead.join(", "));
-
-  const local = [...html.matchAll(/(?:href|src)="([^"#:?]+\.[a-z0-9]+)(?:\?[^"]*)?"/gi)].map((m) => m[1]);
-  const missing = [...new Set(local.filter((f) => !fs.existsSync(path.join(ROOT, decodeURIComponent(f)))))];
-  ok("все локальные файлы из разметки существуют", missing.length === 0, missing.join(", "));
+  const dup = [], dead = [], missing = [];
+  for (const [file, src] of Object.entries(pages)) {
+    const ids = idsOf(src);
+    dup.push(...ids.filter((id, i) => ids.indexOf(id) !== i).map((id) => file + "#" + id));
+    // Якоря на этой странице и на соседних: и файл, и блок должны существовать
+    for (const [, target, hash] of src.matchAll(/href="([a-z]+\.html)?#([^"]+)"/g)) {
+      const where = target ?? file;
+      if (!pages[where] || !idsOf(pages[where]).includes(hash)) dead.push(file + " → " + where + "#" + hash);
+    }
+    const local = [...src.matchAll(/(?:href|src)="([^"#:?]+\.[a-z0-9]+)(?:[?#][^"]*)?"/gi)].map((m) => m[1]);
+    missing.push(...local.filter((f) => !fs.existsSync(path.join(ROOT, decodeURIComponent(f)))).map((f) => file + " → " + f));
+  }
+  ok("id на страницах не повторяются", dup.length === 0, dup.join(", "));
+  ok("все якорные ссылки ведут на существующие блоки, в том числе на соседних страницах", dead.length === 0, [...new Set(dead)].join(", "));
+  ok("все локальные файлы из разметки существуют", missing.length === 0, [...new Set(missing)].join(", "));
 }
 
 {
   // Клиентский текст без внутреннего жаргона методологии (ограничение брифа)
-  const text = html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<!--[\s\S]*?-->/g, "").replace(/<[^>]+>/g, " ");
   const banned = [/\bV7\b/i, /индекс/i, /\bИРК\b/, /\bИФ\b/, /\bКС\b/, /шлюз/i, /\bЛПР\b/, /энтроп/i, /диссонанс/i];
-  const hits = banned.filter((re) => re.test(text)).map(String);
-  ok("в клиентских текстах нет жаргона методологии", hits.length === 0, hits.join(", "));
-
   const promises = [/рост(а|у)? (выручки|прибыли) на/i, /гарантир/i, /увелич\w+ (выручк|прибыл)/i];
-  const p = promises.filter((re) => re.test(text)).map(String);
+  const hits = [], p = [], dashes = [];
+  for (const file of PAGES) {
+    const text = textOf(pages[file]);
+    hits.push(...banned.filter((re) => re.test(text)).map((re) => file + " " + re));
+    p.push(...promises.filter((re) => re.test(text)).map((re) => file + " " + re));
+  }
+  const DASH = /.{0,24}—.{0,12}/g;
+  for (const [file, src] of Object.entries(pages)) {
+    const shown = src.replace(/<!--[\s\S]*?-->/g, "").replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+    dashes.push(...(shown.match(DASH) || []).slice(0, 2).map((t) => file + ": «" + t.trim() + "»"));
+  }
+  // Тексты, которые страница показывает из скрипта
+  const js = read("main.js").replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
+  dashes.push(...(js.match(DASH) || []).slice(0, 2).map((t) => "main.js: «" + t.trim() + "»"));
+  ok("в клиентских текстах нет жаргона методологии", hits.length === 0, hits.join(", "));
   ok("нет обещаний финансового результата", p.length === 0, p.join(", "));
+  ok("в текстах сайта нет длинных тире", dashes.length === 0, dashes.join(" | "));
 
   ok("форма: согласие по 152-ФЗ и ссылка на политику",
     /name="consent"[^>]*required/.test(html) && /href="policy\.html"/.test(html) && !/name="consent"[^>]*checked/.test(html));
-  ok("адрес отправки формы — одна константа", (read("main.js").match(/FORM_ENDPOINT/g) || []).length >= 2 && /const FORM_ENDPOINT = /.test(read("main.js")));
+  ok("адрес отправки формы задан одной константой", (read("main.js").match(/FORM_ENDPOINT/g) || []).length >= 2 && /const FORM_ENDPOINT = /.test(read("main.js")));
 }
 
 const win = {};
@@ -51,14 +70,17 @@ const examples = win.HTDC_EXAMPLES;
 {
   const bad = [];
   for (const ex of examples) {
-    if (!fs.existsSync(path.join(ROOT, "showcase", ex.file))) bad.push(`${ex.id}: нет документа`);
-    if (!fs.existsSync(path.join(ROOT, "showcase/previews", ex.id + ".webp"))) bad.push(`${ex.id}: нет превью`);
-    if (ex.pdf && !fs.existsSync(path.join(ROOT, "showcase/pdf", ex.id + ".pdf"))) bad.push(`${ex.id}: нет PDF`);
+    if (!fs.existsSync(path.join(ROOT, "showcase", ex.file))) bad.push(ex.id + ": нет документа");
+    if (!fs.existsSync(path.join(ROOT, "showcase/previews", ex.id + ".webp"))) bad.push(ex.id + ": нет превью");
+    if (!ex.pdf || !fs.existsSync(path.join(ROOT, "showcase", ex.pdf))) bad.push(ex.id + ": нет PDF");
+    else if (fs.statSync(path.join(ROOT, "showcase", ex.pdf)).mtimeMs + 60000 < fs.statSync(path.join(ROOT, "showcase", ex.file)).mtimeMs) bad.push(ex.id + ": PDF старше документа");
   }
-  ok(`витрина: у каждого из ${examples.length} примеров есть документ, превью и PDF`, bad.length === 0, bad.join("; "));
-  const linked = [...html.matchAll(/example\.html\?doc=([a-z-]+)/g)].map((m) => m[1]);
+  ok("витрина: у каждого из " + examples.length + " примеров есть оформленный документ, превью и свежий PDF", bad.length === 0, bad.join("; "));
+  const linked = [...pages["tools.html"].matchAll(/example\.html\?doc=([a-z-]+)/g)].map((m) => m[1]);
   const unknown = linked.filter((id) => !examples.some((e) => e.id === id));
-  ok("витрина: все ссылки ведут на примеры из реестра", unknown.length === 0 && linked.length === examples.length, unknown.join(", "));
+  ok("витрина: страница инструментов ссылается на все примеры из реестра", unknown.length === 0 && linked.length === examples.length, unknown.join(", "));
+  const old = examples.filter((ex) => !ex.file.startsWith("docs/")).map((ex) => ex.id);
+  ok("витрина: открываются только обновлённые документы из showcase/docs", old.length === 0, old.join(", "));
 }
 
 /* ================= Браузер ================= */
@@ -72,7 +94,7 @@ const VIEWS = {
   phone: { width: 375, height: 812, deviceScaleFactor: 2, isMobile: true, hasTouch: true },
 };
 
-async function open(view, { reduced = false } = {}) {
+async function open(view, { reduced = false, file = "index.html" } = {}) {
   const page = await browser.newPage();
   await page.setViewport(VIEWS[view]);
   if (reduced) await page.emulateMediaFeatures([{ name: "prefers-reduced-motion", value: "reduce" }]);
@@ -81,7 +103,7 @@ async function open(view, { reduced = false } = {}) {
   page.on("pageerror", (e) => errors.push(e.message));
   page.on("requestfailed", (r) => errors.push("не загрузилось: " + r.url()));
   page.on("response", (r) => { if (r.status() >= 400) errors.push(`${r.status()}: ${r.url()}`); });
-  await page.goto(`${srv.url}/index.html`, { waitUntil: "networkidle2" });
+  await page.goto(`${srv.url}/${file}`, { waitUntil: "networkidle2" });
   await page.evaluate(() => document.fonts.ready);
   await sleep(600);
   return { page, errors };
@@ -178,13 +200,33 @@ async function pixelContrast(page) {
   return [...new Set(worst)];
 }
 
-for (const view of ["desktop", "tablet", "phone"]) {
-  console.log(`\nБраузер · ${view} ${VIEWS[view].width}×${VIEWS[view].height}`);
-  const { page, errors } = await open(view);
+async function checkPage(view, file) {
+  console.log("\nБраузер · " + file + " · " + view + " " + VIEWS[view].width + "×" + VIEWS[view].height);
+  const { page, errors } = await open(view, { file });
 
   ok("WebGL работает: туман и сфера на шейдерах", await page.evaluate(() => !document.documentElement.classList.contains("no-gl")));
   const round = await page.evaluate(() => { const r = document.querySelector(".sphere").getBoundingClientRect(); return r.width / r.height; });
-  ok("сфера круглая, а не овал", Math.abs(round - 1) < 0.01, `ширина к высоте ${round.toFixed(3)}`);
+  ok("сфера круглая, а не овал", Math.abs(round - 1) < 0.01, "ширина к высоте " + round.toFixed(3));
+
+  if (file === "index.html") {
+    // Вступление: каждый экран помещается целиком, текст не уходит под шапку и под полоски
+    const fit = [];
+    const n = await page.$$eval("[data-slide]", (els) => els.length);
+    for (let i = 0; i < n; i++) {
+      await page.evaluate((k) => scrollTo({ top: k * document.querySelector(".intro__stage").offsetHeight, behavior: "instant" }), i);
+      await sleep(700);
+      const r = await page.evaluate((k) => {
+        const t = document.querySelectorAll(".slide__text")[k].getBoundingClientRect();
+        const ui = document.querySelector(".intro__ui").getBoundingClientRect();
+        const nav = document.querySelector(".nav").getBoundingClientRect();
+        const o = +getComputedStyle(document.querySelectorAll(".slide__text")[k]).opacity;
+        return { top: t.top - nav.bottom, bottom: ui.top - t.bottom, o };
+      }, i);
+      if (r.top < 0 || r.bottom < 4 || r.o < 0.99) fit.push("экран " + (i + 1) + ": до шапки " + Math.round(r.top) + ", до полосок " + Math.round(r.bottom) + ", видимость " + r.o);
+    }
+    ok("вступление: текст каждого экрана помещается между шапкой и полосками", fit.length === 0, fit.join("; "));
+    await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
+  }
 
   // Пройти страницу до конца, чтобы сработали все появления и подгрузились картинки
   const height = await page.evaluate(() => document.documentElement.scrollHeight);
@@ -195,35 +237,39 @@ for (const view of ["desktop", "tablet", "phone"]) {
   const over = await page.evaluate((w) => Math.max(document.documentElement.scrollWidth, innerWidth) - w, VIEWS[view].width);
   const wide = over > 0 ? await page.evaluate(() => [...document.querySelectorAll("body *")].filter((el) => el.getBoundingClientRect().right > innerWidth + 0.5 && !el.closest(".sheets"))
     .slice(0, 4).map((el) => (el.className || el.tagName) + " " + Math.round(el.getBoundingClientRect().right)).join(", ")) : "";
-  ok("нет горизонтальной прокрутки", over <= 0, over > 0 ? `лишние ${over}px: ${wide}` : "");
+  ok("нет горизонтальной прокрутки", over <= 0, over > 0 ? "лишние " + over + "px: " + wide : "");
 
+  // Заголовки экранов вступления и внутренних страниц длиннее обычных: это целые фразы
   const lines = await page.evaluate(() => [...document.querySelectorAll("h1, h2")].map((h) => {
     const lh = parseFloat(getComputedStyle(h).lineHeight);
-    return { text: h.textContent.trim().slice(0, 30), lines: Math.round(h.getBoundingClientRect().height / lh) };
+    return { text: h.textContent.trim().slice(0, 30), lines: Math.round(h.getBoundingClientRect().height / lh), slide: h.matches(".slide__title, .page-head__title, .chron__title, .exhibit__title") };
   }));
   const limit = view === "phone" ? 3 : 2;
-  const long = lines.filter((l) => l.lines > limit);
-  ok(`заголовки не длиннее ${limit} строк`, long.length === 0, long.map((l) => `«${l.text}»: ${l.lines}`).join("; "));
+  const long = lines.filter((l) => l.lines > limit + (l.slide ? 2 : 0));
+  ok("заголовки не длиннее " + limit + " строк (фразы вступления: " + (limit + 2) + ")", long.length === 0, long.map((l) => "«" + l.text + "»: " + l.lines).join("; "));
 
   const imgs = await page.evaluate(() => [...document.images].filter((i) => !i.complete || i.naturalWidth === 0).map((i) => i.getAttribute("src")));
   ok("все картинки загрузились", imgs.length === 0, imgs.join(", "));
 
   const hidden = await page.evaluate(() => [...document.querySelectorAll("[data-reveal] > *, [data-reveal-self]")]
     .filter((el) => +getComputedStyle(el).opacity < 0.99 && el.getBoundingClientRect().height > 0).length);
-  ok("после прокрутки не осталось скрытого содержимого", hidden === 0, hidden ? `${hidden} элементов` : "");
+  ok("после прокрутки не осталось скрытого содержимого", hidden === 0, hidden ? hidden + " элементов" : "");
 
   const small = await page.evaluate(() => [...document.querySelectorAll("a, button, input, summary")].filter((el) => {
     if (el.closest("[hidden]") || el.matches(".skip")) return false;
     if (el.matches("a") && el.parentElement.textContent.trim().length > el.textContent.trim().length + 8) return false; // ссылка внутри предложения
     const r = (el.matches("input[type=checkbox], input[type=radio]") ? el.closest("label") : el).getBoundingClientRect();
     return r.width > 0 && (r.height < 24 || r.width < 24);
-  }).map((el) => el.textContent.trim().slice(0, 20) || el.name));
+  }).map((el) => el.textContent.trim().slice(0, 20) || el.name || el.className));
   ok("элементы управления не меньше 24 px", small.length === 0, small.join(", "));
 
   const bad = await pixelContrast(page);
-  ok("контраст текста по пикселям не ниже WCAG AA", bad.length === 0, bad.slice(0, 5).join(" | ") + (bad.length > 5 ? ` … ещё ${bad.length - 5}` : ""));
+  ok("контраст текста по пикселям не ниже WCAG AA", bad.length === 0, bad.slice(0, 5).join(" | ") + (bad.length > 5 ? " … ещё " + (bad.length - 5) : ""));
   await page.close();
 }
+
+for (const view of ["desktop", "tablet", "phone"]) await checkPage(view, "index.html");
+for (const file of ["tools.html", "history.html"]) for (const view of ["desktop", "phone"]) await checkPage(view, file);
 
 /* ---------- Поведение (десктоп) ---------- */
 console.log("\nПоведение");
@@ -278,19 +324,52 @@ console.log("\nПоведение");
   const done = await page.evaluate(() => document.activeElement.className + ": " + document.activeElement.textContent.slice(0, 22));
   ok("форма: после отправки появляется подтверждение, фокус на нём", done.startsWith("form__done"), done);
 
-  // Сфера: резкая у якоря, мягкий свет между якорями, снова резкая при прокрутке назад
+  // Сфера: за туманом на первом экране, резкая на третьем, мягкий свет между якорями, снова резкая при прокрутке назад
   const sphere = () => page.evaluate(() => {
     const el = document.querySelector(".sphere");
-    return { visible: getComputedStyle(el).visibility === "visible", w: el.getBoundingClientRect().width };
+    const r = el.getBoundingClientRect();
+    return { visible: getComputedStyle(el).visibility === "visible", w: r.width, x: r.left + r.width / 2, y: r.top + r.height / 2 };
   });
-  await scrollTo(page, 0); await sleep(500);
+  const H = await page.evaluate(() => document.querySelector(".intro__stage").offsetHeight);
+  await scrollTo(page, 0); await sleep(900);
   const s0 = await sphere();
-  await scrollTo(page, 900); await sleep(500);
+  await scrollTo(page, 2 * H); await sleep(1200);
   const s1 = await sphere();
-  await scrollTo(page, 0); await sleep(500);
+  const mid = await page.evaluate(() => document.querySelector("#situations").getBoundingClientRect().top + scrollY + 200);
+  await scrollTo(page, mid); await sleep(900);
   const s2 = await sphere();
-  ok("сфера: крупная у якоря, уходит в свет между якорями и возвращается при обратном скролле",
-    s0.visible && s0.w > 400 && !s1.visible && s2.visible && Math.abs(s2.w - s0.w) < 2, `${Math.round(s0.w)} → ${s1.visible ? Math.round(s1.w) : "свет"} → ${Math.round(s2.w)}`);
+  await scrollTo(page, 2 * H); await sleep(1200);
+  const s3 = await sphere();
+  ok("сфера: свет за туманом на первом экране, резкая на третьем, уходит в свет между якорями и возвращается",
+    !s0.visible && s1.visible && s1.w > 400 && !s2.visible && s3.visible && Math.abs(s3.w - s1.w) < 12,
+    (s0.visible ? "видна" : "свет") + " → " + Math.round(s1.w) + " → " + (s2.visible ? Math.round(s2.w) : "свет") + " → " + Math.round(s3.w));
+
+  // Сфера ходит не только по середине страницы: справа во вступлении, слева у принципов
+  await page.evaluate(() => document.querySelector("#approach .guide__row").scrollIntoView({ block: "center", behavior: "instant" }));
+  await sleep(1400);
+  const s4 = await sphere();
+  const lit = await page.evaluate(() => [...document.querySelectorAll("#approach .guide__row")].map((r) => r.classList.contains("is-on") ? 1 : 0).join(""));
+  ok("сфера: во вступлении стоит справа, у принципов слева и подсвечивает одну строку",
+    s1.x > 1440 * 0.6 && s4.visible && s4.x < 1440 * 0.2 && s4.w < 120 && lit.split("1").length === 2, "x " + Math.round(s1.x) + " → " + Math.round(s4.x) + ", строки " + lit);
+
+  // Мягкий свет встаёт за отмеченный пункт
+  await page.evaluate(() => document.querySelector("#situations").scrollIntoView({ behavior: "instant" }));
+  await sleep(600);
+  await page.click('.check input[value="s4"]');
+  await sleep(1500);
+  const spot = await page.evaluate(() => {
+    const b = document.querySelector('.check input[value="s4"]').getBoundingClientRect();
+    const s = document.querySelector(".sphere").getBoundingClientRect();
+    return Math.hypot(b.left + b.width / 2 - (s.left + s.width / 2), b.top + b.height / 2 - (s.top + s.height / 2));
+  });
+  ok("свет: встаёт за отмеченным пунктом", spot < 6, "смещение " + spot.toFixed(1) + "px");
+  await page.click('.check input[value="s4"]');
+
+  // Шапка: отмечает текущий раздел
+  await page.evaluate(() => document.querySelector("#process").scrollIntoView({ behavior: "instant" }));
+  await sleep(400);
+  const current = await page.evaluate(() => [...document.querySelectorAll(".nav__links a[aria-current]")].map((a) => a.textContent).join(","));
+  ok("шапка: отмечает раздел, который сейчас на экране", current === "Как проходит", current);
 
   // Плавность: интервалы между кадрами при прокрутке. В headless шейдеры считает процессор, поэтому это только справка
   const frames = await page.evaluate(async () => {
@@ -305,6 +384,97 @@ console.log("\nПоведение");
   });
   note(`кадр при прокрутке (без видеокарты): медиана ${frames.median.toFixed(1)} мс, 95-й перцентиль ${frames.p95.toFixed(1)} мс`);
   await page.close();
+}
+
+/* ---------- Вступление: доводка и автолистание ---------- */
+{
+  const { page } = await open("desktop");
+  const H = await page.evaluate(() => document.querySelector(".intro__stage").offsetHeight);
+  const at = () => page.evaluate(() => scrollY);
+  const near = (y, target) => Math.abs(y - target) < 3;
+
+  // Автолистание: пока посетитель ничего не трогает, экран сменяется сам. Время ожидания сокращено для проверки
+  await page.evaluate(() => {
+    for (const s of document.querySelectorAll("[data-slide]")) if (s.dataset.hold) s.dataset.hold = "0.4";
+    const play = document.querySelector("[data-play]");
+    if (play.hasAttribute("data-paused")) play.click(); else { play.click(); play.click(); }
+  });
+  await sleep(2600);
+  const a1 = await at();
+  ok("вступление: без действий посетителя экраны листаются сами", a1 >= H - 3, "прокрутка " + Math.round(a1) + " при высоте экрана " + H);
+  await sleep(6500);
+  const a2 = await at();
+  const paused = await page.$eval("[data-play]", (el) => el.hasAttribute("data-paused"));
+  ok("вступление: автолистание доходит до последнего экрана и останавливается", near(a2, 3 * H) && paused, "прокрутка " + Math.round(a2) + ", пауза " + paused);
+
+  // Доводка: небольшая прокрутка довозит до следующего экрана, в обе стороны
+  await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
+  await sleep(500);
+  await page.mouse.move(700, 450);
+  await page.mouse.wheel({ deltaY: 160 });
+  await sleep(1800);
+  const w1 = await at();
+  await page.mouse.wheel({ deltaY: -160 });
+  await sleep(1800);
+  const w2 = await at();
+  ok("вступление: прокрутка сама доезжает до соседнего экрана, вперёд и назад", near(w1, H) && near(w2, 0), Math.round(w1) + " → " + Math.round(w2));
+
+  // Любое действие отключает автолистание
+  const stopped = await page.$eval("[data-play]", (el) => el.hasAttribute("data-paused"));
+  ok("вступление: действие посетителя отключает автолистание", stopped);
+
+  // «Дальше» и полоски
+  await page.click("[data-next]");
+  await sleep(1300);
+  const n1 = await at();
+  await page.click('[data-go="3"]');
+  await sleep(1600);
+  const n2 = await at();
+  const lastNext = await page.$eval("[data-next]", (el) => el.hidden);
+  ok("вступление: «Дальше» и полоски переключают экраны", near(n1, H) && near(n2, 3 * H) && lastNext, Math.round(n1) + " → " + Math.round(n2));
+
+  // Ссылка из шапки не спорит с доводкой
+  await page.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
+  await sleep(400);
+  await page.mouse.wheel({ deltaY: 160 });
+  await sleep(250);
+  await page.click('.nav__links a[href="#formats"]');
+  await sleep(2500);
+  const gap = await page.evaluate(() => Math.abs(document.querySelector("#formats").getBoundingClientRect().top - 96));
+  ok("вступление: переход по ссылке шапки во время доводки доходит до раздела", gap < 4, "мимо на " + Math.round(gap) + "px");
+  await page.close();
+}
+
+/* ---------- Меню на телефоне и внутренние страницы ---------- */
+{
+  const { page } = await open("phone");
+  const shown = () => page.evaluate(() => getComputedStyle(document.querySelector(".nav__links")).visibility === "visible");
+  const before = await shown();
+  await page.click(".nav__toggle");
+  await sleep(600);
+  const opened = await shown();
+  await page.keyboard.press("Escape");
+  await sleep(600);
+  const closed = !(await shown());
+  await page.click(".nav__toggle");
+  await sleep(500);
+  await page.evaluate(() => document.querySelector('.nav__links a[href="#faq"]').click());
+  await sleep(2200);
+  const arrived = await page.evaluate(() => Math.abs(document.querySelector("#faq").getBoundingClientRect().top) < innerHeight * 0.5);
+  ok("меню на телефоне: открывается кнопкой, закрывается по Escape, ссылка ведёт к разделу", !before && opened && closed && arrived && !(await shown()),
+    [before, opened, closed, arrived].join(","));
+  await page.close();
+
+  // С внутренних страниц шапка ведёт на главную и на соседнюю страницу
+  const sub = await open("desktop", { file: "tools.html" });
+  const hrefs = await sub.page.$$eval(".nav__links a", (els) => els.map((a) => a.getAttribute("href") + (a.getAttribute("aria-current") ? "*" : "")).join(" "));
+  ok("внутренние страницы: шапка ведёт к разделам главной, текущая страница отмечена",
+    hrefs.includes("index.html#situations") && hrefs.includes("tools.html*") && hrefs.includes("history.html"), hrefs);
+  await sub.page.goto(srv.url + "/index.html#history", { waitUntil: "networkidle2" });
+  await sleep(1200);
+  const landed = await sub.page.evaluate(() => { const r = document.querySelector("#history").getBoundingClientRect(); return r.top > -5 && r.top < innerHeight * 0.5; });
+  ok("ссылка на раздел главной с внутренней страницы открывает главную сразу на этом разделе", landed);
+  await sub.page.close();
 }
 
 /* ---------- Просмотр примеров ---------- */
@@ -326,6 +496,7 @@ console.log("\nПоведение");
     if (ex.pdf) {
       const res = await page.evaluate((u) => fetch(u).then((r) => r.status), state.pdf);
       if (res !== 200) bad.push(`${ex.id}: PDF ${res}`);
+      if (!String(state.pdf).startsWith("showcase/docs/")) bad.push(`${ex.id}: PDF не из showcase/docs`);
     }
   }
   ok(`примеры: все ${examples.length} открываются в рамке, PDF скачиваются`, bad.length === 0, bad.join("; "));
@@ -347,7 +518,11 @@ console.log("\nprefers-reduced-motion: reduce");
   }));
   ok("анимации появления выключены, всё содержимое видно сразу", !st.motion && st.hidden === 0, `скрыто ${st.hidden}`);
   ok("сцена раскрытия заменена обычным светлым листом", st.scene < 1.2, `высота ${st.scene.toFixed(2)} экрана`);
-  const a = await page.evaluate(() => { const s = document.querySelector(".sphere").getBoundingClientRect(), o = document.querySelector(".hero__orb").getBoundingClientRect(); return Math.abs((s.left + s.width / 2) - (o.left + o.width / 2)) + Math.abs((s.top + s.height / 2) - (o.top + o.height / 2)); });
+  const stacked = await page.evaluate(() => getComputedStyle(document.querySelector(".slide")).position !== "absolute" && getComputedStyle(document.querySelector(".intro__ui")).display === "none");
+  ok("вступление без анимации: четыре обычных экрана подряд, без автолистания", stacked);
+  await page.evaluate(() => document.querySelector(".slide--source").scrollIntoView({ behavior: "instant" }));
+  await sleep(500);
+  const a = await page.evaluate(() => { const s = document.querySelector(".sphere").getBoundingClientRect(), o = document.querySelector(".slide--source .slide__orb").getBoundingClientRect(); return Math.abs((s.left + s.width / 2) - (o.left + o.width / 2)) + Math.abs((s.top + s.height / 2) - (o.top + o.height / 2)); });
   ok("сфера стоит в своём слоте и не плавает", a < 2, `смещение ${a.toFixed(1)}px`);
   // Кадры не идут сами по себе: холст не перерисовывается без прокрутки
   const idle = await page.evaluate(async () => {

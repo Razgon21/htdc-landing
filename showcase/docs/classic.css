@@ -1,0 +1,487 @@
+/* Стилистика сайта поверх разметки оригинальных документов методолога.
+   Классы здесь — те, что в исходных файлах (card, metric-item, values-table и т. д.):
+   разметка и компоновка остаются авторскими, меняется только оформление.
+   Токены, лист и обложка — из doc.css. */
+
+/* ---------- Лист ---------- */
+.page.sheet { padding: 11mm 13mm 9mm; font-size: 9pt; line-height: 1.42; }
+.page p, .page li { font-size: inherit; }
+
+/* Голова листа: заголовок антиквой, подпись строчными */
+.page .header { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 0 10mm; margin-bottom: 5mm; flex-shrink: 0; }
+.page .header-left h1, .page .header-left h2 { font: 500 21pt/1.05 var(--serif); letter-spacing: -0.012em; text-wrap: balance; }
+.page .header-left p { margin-top: 1.6mm; font-size: 9.5pt; color: var(--ink-2); }
+.page .header-right { text-align: right; font-size: 8.5pt; color: var(--ink-3); line-height: 1.45; }
+.page .header-right strong { display: block; color: var(--ink); font-size: 9.5pt; font-weight: 600; }
+.page .header-right span { display: block; }
+
+/* Колонтитул */
+.page .folio { margin-top: auto; padding-top: 2.6mm; flex-shrink: 0; }
+.page .folio + * { display: none; }
+
+/* ---------- Сетки (как в оригинале) ---------- */
+.grid { display: grid; grid-template-columns: 1fr 1.1fr 1fr; gap: 3.5mm; flex-grow: 1; align-items: stretch; }
+.grid-3-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3.5mm; flex-grow: 1; }
+
+/* ---------- Карточки: тон вместо рамки, смысл — маркером в заголовке ---------- */
+.card { background: var(--tone); padding: 4mm 4.4mm; display: flex; flex-direction: column; }
+.card.gold { background: #ebeff4; }
+.card.blue { background: #dfe6ef; }
+.card.green { background: #e7ebf0; }
+.card.purple { background: #e4e6ef; }
+.card.red { background: var(--tone-2); }
+.card-title { display: flex; align-items: center; gap: 2.2mm; margin-bottom: 2.4mm; font: 600 12pt/1.15 var(--serif); letter-spacing: -0.003em; color: var(--ink); }
+.card-title::before { content: ""; flex: none; width: 2.2mm; height: 2.2mm; border-radius: 50%; background: var(--ink-3); }
+.card.gold .card-title::before, .card.blue .card-title::before, .card.purple .card-title::before { background: var(--deep); }
+.card.green .card-title::before { background: none; box-shadow: inset 0 0 0 0.45mm var(--deep); }
+.card.red .card-title::before { background: var(--ink); }
+
+.big-text { font: 600 12.5pt/1.2 var(--serif) !important; margin-bottom: 1.6mm; color: var(--ink); }
+.detail-text { display: block; font-size: 8.5pt !important; color: var(--ink-2); line-height: 1.4; margin-top: 0.6mm; }
+.card p + p { margin-top: 1.4mm; }
+
+/* Списки: точка вместо стрелки */
+.page ul { list-style: none; padding: 0; }
+.page ul li { position: relative; padding-left: 4mm; margin-bottom: 2mm; line-height: 1.4; }
+.page ul li:last-child { margin-bottom: 0; }
+.page ul li::before { content: ""; position: absolute; left: 0.3mm; top: 0.6em; width: 1.5mm; height: 1.5mm; border-radius: 50%; background: var(--deep); }
+.card.red ul li::before { background: var(--ink); }
+
+/* Плашка внутри карточки (в оригинале — белые вставки с цветной рамкой) */
+.blk { background: var(--paper); padding: 2.6mm 3.2mm; }
+.blk strong { font-weight: 600; }
+.card .blk { margin-top: 2mm; }
+.page > .blk, .page > div > .blk { background: var(--tone); }
+
+/* ---------- Показатели ---------- */
+.metrics-box { margin-top: 1mm; }
+.metric-item + .metric-item { margin-top: 2.6mm; }
+.metric-header { display: flex; justify-content: space-between; gap: 3mm; font-weight: 600; font-size: 9pt; }
+.metric-header span:last-child { font-variant-numeric: tabular-nums; }
+.metric-bar { display: block; height: 1.4mm; margin: 1mm 0 1.2mm; background: var(--tone-2); position: relative; }
+.card .metric-bar { background: #cdd5e0; }
+.metric-bar::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--v); background: var(--deep); }
+.metric-bar.is-inverse::after { background: var(--ink-3); }
+.metric-now, .metric-future { font-size: 8.5pt; line-height: 1.38; }
+.metric-now { color: var(--ink-2); }
+.metric-now strong, .metric-future strong { font-weight: 600; color: var(--ink); }
+
+/* «Одно ≠ другое» */
+.system-gap { display: flex; align-items: center; justify-content: space-between; gap: 3mm; margin: auto 0 3mm; padding: 3.4mm 0; box-shadow: inset 0 0.3mm 0 #c6cfdb, inset 0 -0.3mm 0 #c6cfdb; }
+.sg-side { flex: 1; text-align: center; font: 600 12pt/1.15 var(--serif); }
+.sg-side span { display: block; margin-bottom: 0.8mm; font: 400 8pt/1.2 var(--sans); color: var(--ink-3); }
+.sg-side strong { display: block; font: 600 12pt/1.15 var(--serif); }
+.sg-arrow { font: 400 18pt/1 var(--serif); color: var(--deep); }
+
+/* Реплики «вместо — скажите» */
+.script-box { background: var(--paper); padding: 2.6mm 3.2mm; font: italic 500 11pt/1.3 var(--serif); }
+.script-box + .script-box { margin-top: 1.6mm; }
+.script-box strong { display: block; margin-bottom: 0.8mm; font: 600 8pt/1.2 var(--sans); font-style: normal; color: var(--ink-3); }
+
+/* Готовность */
+.level-block { background: var(--paper); padding: 3mm 3.4mm; margin: 0 0 3mm; }
+.level-block .card-title { font-size: 11pt; margin-bottom: 1.6mm; }
+.level-row { display: grid; grid-template-columns: 24mm 1fr; gap: 3mm; font-size: 8.5pt; }
+.level-row + .level-row { margin-top: 1.2mm; }
+.level-row > :first-child, .level-label { color: var(--ink-3); flex: none; }
+.level-row > :last-child, .level-value { font-weight: 600; }
+
+/* Факты */
+.fact-block { margin: 1mm 0 3mm; }
+.fact-label { font: 600 11pt/1.2 var(--serif); margin-bottom: 1.4mm; }
+.fact-row { display: flex; justify-content: space-between; gap: 4mm; padding: 1.2mm 0; font-size: 8.5pt; box-shadow: inset 0 -0.3mm 0 #c6cfdb; }
+.fact-row:last-child { box-shadow: none; }
+.fact-row > :first-child { color: var(--ink-3); }
+.fact-row > :last-child { font-weight: 600; text-align: right; }
+
+/* ---------- Блоки во всю ширину ---------- */
+.summary-banner { background: var(--night-2); color: var(--on-night); padding: 5mm 6mm; margin-bottom: 3.5mm; flex-shrink: 0; }
+.summary-banner .label { font: 600 11pt/1.2 var(--serif); color: var(--light); margin-bottom: 1.8mm; }
+.summary-banner .text { font: 500 14pt/1.3 var(--serif); }
+.summary-banner .text strong { color: var(--light); font-weight: 600; }
+
+.mission-block { background: var(--night-2); color: var(--on-night); padding: 5mm 6mm; margin-bottom: 3.5mm; }
+.mission-label { font: 600 11pt/1.2 var(--serif); color: var(--light); margin-bottom: 2mm; }
+.mission-quote { font: italic 500 16pt/1.3 var(--serif); margin-bottom: 2.6mm; }
+.mission-verify { font-size: 9pt; color: var(--on-night-2); line-height: 1.5; }
+.mission-verify strong { color: var(--light); font-weight: 600; }
+
+.values-block { background: var(--tone); padding: 4.4mm 5mm; margin-bottom: 3.5mm; }
+.values-summary { font-size: 9.5pt; line-height: 1.5; margin: 1mm 0 3mm; }
+.values-summary strong { font-weight: 600; }
+.values-table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+.values-table th { text-align: left; font-weight: 600; font-size: 8pt; color: var(--ink-2); padding: 0 3mm 1.8mm 0; }
+.values-table td { padding: 2mm 3mm 2mm 0; vertical-align: top; box-shadow: inset 0 -0.3mm 0 #c6cfdb; }
+.values-table tr:last-child td { box-shadow: none; }
+.values-table td:first-child { font-weight: 600; }
+.mark { display: inline-flex; align-items: center; gap: 2mm; white-space: nowrap; font-weight: 600; }
+.mark::before { content: ""; flex: none; width: 2.8mm; height: 2.8mm; border-radius: 50%; box-shadow: inset 0 0 0 0.45mm var(--deep); }
+.mark.orange::before { background: linear-gradient(90deg, var(--deep) 50%, transparent 50%); }
+.mark.red::before { background: var(--ink); box-shadow: none; }
+
+.prism-block { background: var(--tone-2); padding: 4.4mm 5mm; margin-bottom: 3.5mm; }
+.prism-block .label { font: 600 11pt/1.2 var(--serif); margin-bottom: 1.8mm; }
+.prism-block .quote { font: italic 500 14pt/1.3 var(--serif); margin-bottom: 1.8mm; }
+.prism-block .quote::before, .prism-block .quote::after { content: none; }
+
+.chain-block { background: var(--tone); padding: 4mm 5mm; margin-bottom: 3.5mm; }
+.chain-block h4 { font: 600 11pt/1.2 var(--serif); margin-bottom: 1.4mm; }
+.chain-block p { font-size: 9.5pt; line-height: 1.5; }
+.chain-block strong { font-weight: 600; }
+
+/* ---------- Блоки плана ---------- */
+.insight-block { background: var(--paper); padding: 2.6mm 3.2mm; }
+.insight-block + .insight-block { margin-top: 1.6mm; }
+.insight-title { font-weight: 600; font-size: 9pt; margin-bottom: 0.8mm; }
+.insight-text { font-size: 8.5pt; color: var(--ink-2); line-height: 1.4; }
+.insight-text em { font-style: normal; font-weight: 600; color: var(--ink); }
+
+.metric-delta-block { background: var(--paper); padding: 2.6mm 3.2mm; margin-top: 2.4mm; }
+.metric-delta-block .label { font: 600 10.5pt/1.2 var(--serif); margin-bottom: 1.2mm; }
+.metric-delta-row { display: flex; justify-content: space-between; gap: 3mm; font-size: 8.5pt; }
+.metric-delta-row + .metric-delta-row { margin-top: 0.6mm; }
+.metric-delta-name { color: var(--ink-2); }
+.metric-delta-val { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.how-to-measure { margin-top: 1.6mm; font-size: 8pt; color: var(--ink-3); line-height: 1.38; }
+.why-connect { margin-top: 1.8mm; font: italic 500 10pt/1.3 var(--serif); color: var(--ink); }
+.value-block { background: var(--night-2); color: var(--on-night); padding: 2.8mm 3.4mm; margin-top: auto; }
+.card .value-block { margin-top: 2.4mm; }
+.value-block strong { display: block; margin-bottom: 0.8mm; font: 600 10.5pt/1.2 var(--serif); color: var(--light); }
+.value-block span { display: block; font-size: 8.5pt; line-height: 1.4; }
+
+/* ---------- Эксперимент (третья инструкция) ---------- */
+.shluz-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3.5mm; flex-grow: 1; }
+.quarter { background: var(--tone); display: flex; flex-direction: column; }
+.quarter-header { background: var(--night-2); color: var(--on-night); padding: 3.4mm 4mm; }
+.quarter-header h3 { font: 600 13pt/1.15 var(--serif); color: var(--light); }
+.quarter-header p { font-size: 8.5pt; color: var(--on-night-2); margin-top: 0.6mm; }
+.quarter-body { padding: 3.4mm 4mm; display: flex; flex-direction: column; gap: 2.2mm; flex: 1; }
+.quarter-footer { padding: 2.4mm 4mm; font-weight: 600; font-size: 8.5pt; background: var(--tone-2); }
+.dash-block { background: var(--paper); padding: 2.4mm 3mm; }
+.dash-title { font: 600 10.5pt/1.2 var(--serif); margin-bottom: 0.8mm; }
+.dash-row { font-size: 8.5pt; }
+.action-block { font-size: 8.5pt; line-height: 1.4; }
+.action-block strong { display: block; font: 600 10.5pt/1.2 var(--serif); margin-bottom: 0.6mm; }
+.quarter .value-block { margin-top: auto; }
+
+/* Прочие заголовки и абзацы внутри листа */
+.page h4 { font: 600 11pt/1.2 var(--serif); margin-bottom: 1.2mm; }
+.page h3 { font-weight: 600; }
+
+/* Строка «продолжение» на добавленных листах */
+.header-left .cont { color: var(--ink-3); font-size: 9.5pt; }
+
+/* Лист с показателями крупно */
+.solo { flex-grow: 1; display: flex; flex-direction: column; }
+.solo > .card { flex-grow: 1; padding: 6mm 7mm; }
+.solo .card-title { font-size: 15pt; margin-bottom: 4mm; }
+.solo .metrics-box { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7mm 8mm; }
+.solo .metric-item + .metric-item { margin-top: 0; }
+.solo .metric-item { background: var(--paper); padding: 4mm 4.5mm; }
+.solo .metric-header { font-size: 10.5pt; }
+.solo .metric-now, .solo .metric-future { font-size: 9.5pt; }
+.solo .metric-bar { height: 2mm; margin: 2mm 0; background: var(--tone-2); }
+
+/* Колонка на листах-продолжениях */
+.col { display: flex; flex-direction: column; gap: 3.5mm; }
+.col > .card { flex: 1 1 auto; }
+.card > .level-block { margin-bottom: 0; }
+
+/* Плотный лист: тот же кегль, меньше воздуха внутри карточек */
+.tight .header { margin-bottom: 3.6mm; }
+.tight .grid, .tight .grid-3-col, .tight .shluz-grid { gap: 3mm; }
+.tight .card { padding: 3.2mm 3.8mm; }
+.tight .card-title { margin-bottom: 1.8mm; }
+.tight ul li { margin-bottom: 1.3mm; }
+.tight .metric-delta-block, .tight .card .value-block { margin-top: 1.6mm; padding: 2.2mm 3mm; }
+.tight .how-to-measure, .tight .why-connect { margin-top: 1.2mm; }
+.tight .chain-block, .tight .values-block, .tight .prism-block, .tight .mission-block { padding: 3.2mm 4.2mm; margin-bottom: 3mm; }
+.tight .insight-block { padding: 2.2mm 2.8mm; }
+.tight .insight-block + .insight-block { margin-top: 1.2mm; }
+.tight.sheet { font-size: 8.6pt; }
+.tight .card-title { font-size: 11.5pt; }
+.tight .big-text { font-size: 12pt !important; }
+.tight.sheet { padding-top: 9mm; padding-bottom: 7mm; }
+.tight .header { margin-bottom: 3mm; }
+.tight .header-left h1, .tight .header-left h2 { font-size: 18.5pt; }
+.tight .header-left p { margin-top: 1mm; }
+.tight .folio { padding-top: 2mm; }
+.tight ul li { margin-bottom: 1mm; }
+.tight .chain-block, .tight .values-block, .tight .prism-block, .tight .mission-block { margin-bottom: 2.6mm; }
+.tight .level-block, .tight .fact-block { margin-bottom: 2.4mm; }
+.tight .metric-delta-block { margin-top: 1.2mm; }
+.tight .insight-block + .insight-block { margin-top: 1mm; }
+.tight .system-gap { padding: 2.4mm 0; margin-bottom: 2.4mm; }
+.tight.sheet { padding-top: 8mm; padding-bottom: 6.5mm; }
+.tight .header-left h1, .tight .header-left h2 { font-size: 18pt; }
+
+/* Просторный лист: текста меньше, чем места, — кегль крупнее */
+.airy.sheet { font-size: 10.2pt; line-height: 1.45; }
+.airy .card { padding: 5mm 5.5mm; }
+.airy .card-title { font-size: 14pt; margin-bottom: 3mm; }
+.airy .big-text { font-size: 15pt !important; }
+.airy .detail-text, .airy .metric-now, .airy .metric-future, .airy .level-row { font-size: 9.6pt !important; }
+.airy .summary-banner .text { font-size: 16pt; }
+.airy .script-box { font-size: 12.5pt; }
+.airy .sg-side, .airy .sg-side strong { font-size: 14pt; }
+.airy ul li { margin-bottom: 3mm; }
+
+/* Лист показателей: карточки на всю высоту */
+.solo > .card { display: flex; flex-direction: column; }
+.solo .metrics-box { flex: 1; grid-auto-rows: 1fr; }
+.solo .metric-item { display: flex; flex-direction: column; justify-content: center; padding: 5mm 5.5mm; }
+.solo .metric-header { font-size: 11.5pt; }
+.solo .metric-now, .solo .metric-future { font-size: 10.2pt; line-height: 1.45; }
+.solo .metric-now { margin-bottom: 1.4mm; }
+
+/* ======================================================================
+   Аватар компании (body.avatar): слой — слева данные, справа тачборд
+   ====================================================================== */
+.avatar .layer { display: grid; grid-template-columns: 1fr 84mm; gap: 6mm; align-items: start; flex-grow: 1; }
+.avatar .layer.v7-core { grid-template-columns: 1fr; }
+.avatar .layer-badge { display: none; }
+.avatar .layer-title { font: 500 15pt/1.2 var(--serif); margin-bottom: 4mm; }
+.avatar .layer-title .accent { color: var(--ink-2); }
+.avatar .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8mm; margin-bottom: 4mm; }
+.avatar .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8mm; margin-bottom: 4mm; }
+.avatar .card { padding: 3.6mm 4mm; }
+.avatar .card-title { font: 600 8.5pt/1.3 var(--sans); color: var(--ink-2); margin-bottom: 1.4mm; }
+.avatar .card-title::before { content: none; }
+.avatar .card-value { font: 500 19pt/1.05 var(--sans); letter-spacing: -0.01em; margin-bottom: 1.4mm; }
+.avatar .card-desc { font-size: 8.5pt; color: var(--ink-2); line-height: 1.38; }
+.avatar .card.highlight { background: var(--night-2); color: var(--on-night); }
+.avatar .card.highlight .card-title, .avatar .card.highlight .card-desc { color: var(--on-night-2); }
+.avatar .card.bad { background: var(--tone-2); }
+.avatar .card.bad .card-value::after { content: ""; display: inline-block; width: 2.4mm; height: 2.4mm; margin-left: 2.4mm; vertical-align: 0.6mm; border-radius: 50%; background: var(--ink); }
+
+.avatar .data-table { width: 100%; border-collapse: collapse; font-size: 9pt; margin-bottom: 4mm; }
+.avatar .data-table th { text-align: left; font-weight: 600; font-size: 8pt; color: var(--ink-2); padding: 0 3mm 1.8mm 0; }
+.avatar .data-table td { padding: 2mm 3mm 2mm 0; vertical-align: top; box-shadow: inset 0 -0.3mm 0 var(--tone-2); }
+.avatar .data-table tr:last-child td { box-shadow: none; }
+.avatar .data-table td:first-child { font-weight: 600; }
+/* Статусы в ячейках: больше заливки — хуже */
+.avatar td.red, .avatar td.gold, .avatar td.green { font-weight: 600; }
+.avatar .layer-content td.red::before, .avatar .layer-content td.gold::before, .avatar .layer-content td.green::before {
+  content: ""; display: inline-block; width: 2.4mm; height: 2.4mm; margin-right: 1.8mm; vertical-align: -0.2mm; border-radius: 50%; box-shadow: inset 0 0 0 0.45mm var(--deep);
+}
+.avatar .layer-content td.gold::before { background: linear-gradient(90deg, var(--deep) 50%, transparent 50%); }
+.avatar .layer-content td.red::before { background: var(--ink); box-shadow: none; }
+
+.avatar .scenario-block { background: var(--night-2); color: var(--on-night); padding: 4mm 5mm; }
+.avatar .scenario-title { font: 600 12pt/1.2 var(--serif); color: var(--light); margin-bottom: 1.2mm; }
+.avatar .scenario-text { font-size: 9pt; line-height: 1.45; }
+
+/* Тачборд: тёмный экран, как на сайте */
+.avatar .touchboard { background: var(--night); color: var(--on-night); padding: 4mm 4.4mm; }
+.avatar .tb-header { display: flex; justify-content: space-between; gap: 3mm; font-size: 8pt; color: var(--on-night-2); padding-bottom: 2.4mm; margin-bottom: 3mm; box-shadow: inset 0 -0.3mm 0 #222a39; }
+.avatar .tb-header-title { color: var(--on-night); font-weight: 600; letter-spacing: 0.04em; }
+.avatar .plasma-scene { height: 40mm; display: flex; align-items: flex-end; justify-content: center; margin-bottom: 3mm;
+  background: url("assets/sphere.webp") center 40% / 34mm no-repeat; }
+.avatar .plasma-core { display: none; }
+.avatar .plasma-label { font-size: 8pt; color: var(--on-night-2); }
+.avatar .tb-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8mm; margin-top: 3mm; }
+.avatar .tb-metric { background: var(--night-2); padding: 2.4mm 2.6mm; text-align: center; }
+.avatar .tb-metric-label { font-size: 7.5pt; color: var(--on-night-2); }
+.avatar .tb-metric-value { font: 500 14pt/1.1 var(--sans); }
+.avatar .tb-metric-value.red { color: #fff; text-decoration: underline 0.5mm var(--light); text-underline-offset: 1.2mm; }
+.avatar .touchboard .data-table { margin: 0; font-size: 8.5pt; }
+.avatar .touchboard .data-table th { color: var(--on-night-2); }
+.avatar .touchboard .data-table td { box-shadow: inset 0 -0.3mm 0 #222a39; }
+.avatar .touchboard td.red, .avatar .touchboard td.gold, .avatar .touchboard td.green { color: var(--light); }
+.avatar .tb-note { margin-top: 2.4mm; font-size: 8pt; color: var(--on-night-2); }
+.avatar .progress-row { display: grid; grid-template-columns: 22mm 1fr 12mm; align-items: center; gap: 2.4mm; font-size: 8.5pt; margin-bottom: 2mm; }
+.avatar .progress-label { color: var(--on-night-2); }
+.avatar .progress-track { height: 2.4mm; background: #222a39; position: relative; }
+.avatar .progress-fill { height: 100%; background: var(--on-night-2); }
+.avatar .progress-fill.red { background: var(--light); }
+.avatar .progress-value { text-align: right; font-weight: 600; }
+
+.avatar .tb-v7-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.8mm; margin-bottom: 4mm; }
+.avatar .tb-v7-item { background: var(--tone); padding: 3mm; text-align: center; }
+.avatar .tb-v7-item-title { font: 600 10.5pt/1.2 var(--serif); }
+.avatar .tb-v7-item-icon { display: none; }
+
+/* Роли */
+.avatar .role-card { display: grid; grid-template-columns: 30mm 1fr; gap: 1mm 5mm; padding: 2.8mm 0; box-shadow: inset 0 -0.3mm 0 var(--tone-2); }
+.avatar .role-card:last-of-type { box-shadow: none; }
+.avatar .role-name { grid-row: span 2; font: 600 12pt/1.15 var(--serif); }
+.avatar .role-name span, .avatar .role-name small { display: block; font: 400 8.5pt/1.3 var(--sans); color: var(--ink-2); }
+.avatar .role-dissonance { font: italic 500 11pt/1.3 var(--serif); }
+.avatar .role-exchange { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8mm; }
+.avatar .role-get, .avatar .role-give { background: var(--tone); padding: 2.2mm 3mm; }
+.avatar .role-give { background: var(--tone-2); }
+.avatar .role-label { font-size: 7.5pt; color: var(--ink-3); margin-bottom: 0.4mm; }
+.avatar .role-value { font-size: 8.5pt; line-height: 1.38; }
+
+/* Проверки (шлюзы) */
+.avatar .shluz-card { background: var(--tone); padding: 3.6mm 4.4mm; }
+.avatar .shluz-card + .shluz-card { margin-top: 0.8mm; }
+.avatar .shluz-card.active { background: var(--night-2); color: var(--on-night); }
+.avatar .shluz-name { font: 600 12.5pt/1.2 var(--serif); margin-bottom: 0.8mm; }
+.avatar .shluz-card.active .shluz-name { color: var(--light); }
+.avatar .shluz-meta { font-size: 8pt; color: var(--ink-3); margin-bottom: 1.2mm; }
+.avatar .shluz-card.active .shluz-meta { color: var(--on-night-2); }
+.avatar .shluz-desc { font-size: 9pt; line-height: 1.42; }
+
+/* Шапка компании и легенда */
+.avatar .subtitle { margin-top: 1.6mm; font-size: 9.5pt; color: var(--ink-2); }
+.avatar .status-bar { display: flex; flex-wrap: wrap; gap: 0.8mm; margin-bottom: 5mm; }
+.avatar .status-item { flex: 1 1 auto; background: var(--tone); padding: 2.6mm 3.4mm; font-size: 8.5pt; color: var(--ink-2); }
+.avatar .status-item strong, .avatar .status-value, .avatar .status-item b { display: block; font: 600 11pt/1.2 var(--sans); color: var(--ink); }
+.avatar .legend { display: flex; gap: 6mm; flex-wrap: wrap; margin-top: 4mm; font-size: 8pt; color: var(--ink-2); }
+.avatar .legend-item { display: flex; align-items: center; gap: 1.8mm; }
+.avatar .legend-box { width: 3.4mm; height: 3.4mm; background: var(--tone); }
+.avatar .legend-item:nth-child(2) .legend-box { background: var(--night-2); }
+.avatar .legend-item:nth-child(3) .legend-box { background: var(--ink); border-radius: 50%; }
+.avatar .legend-item:nth-child(4) .legend-box { border-radius: 50%; background: none; box-shadow: inset 0 0 0 0.45mm var(--deep); }
+.avatar .legend-item:nth-child(5) .legend-box { background: var(--deep); }
+.avatar .status-dot { display: none; }
+.avatar .status-label { display: block; }
+
+/* Аватар: по одному слою на лист, поэтому кегль крупнее — слой занимает лист, а не его половину */
+.avatar .page.sheet { font-size: 10pt; }
+.avatar .layer { grid-template-columns: 1fr 92mm; gap: 7mm; }
+.avatar .layer-name { font-size: 9pt; color: var(--ink-3); margin-bottom: 0.6mm; }
+.avatar .layer-title { font-size: 18pt; margin-bottom: 5mm; }
+.avatar .grid-4, .avatar .grid-3 { margin-bottom: 6mm; }
+.avatar .card { padding: 5mm 5mm; }
+.avatar .card-title { font-size: 9.5pt; margin-bottom: 2mm; }
+.avatar .card-value { font-size: 24pt; margin-bottom: 2mm; }
+.avatar .card-desc { font-size: 9.5pt; line-height: 1.42; }
+.avatar .data-table { font-size: 10pt; margin-bottom: 6mm; }
+.avatar .data-table th { font-size: 8.5pt; padding-bottom: 2.4mm; }
+.avatar .data-table td { padding: 2.8mm 3mm 2.8mm 0; }
+.avatar .scenario-block { padding: 5mm 6mm; }
+.avatar .scenario-title { font-size: 14pt; margin-bottom: 1.8mm; }
+.avatar .scenario-text { font-size: 10pt; }
+.avatar .touchboard { padding: 5mm 5.4mm; }
+.avatar .tb-header { font-size: 8.5pt; }
+.avatar .plasma-scene { height: 52mm; background-size: 46mm; -webkit-mask-image: radial-gradient(closest-side, #000 60%, transparent 100%); mask-image: radial-gradient(closest-side, #000 60%, transparent 100%); }
+.avatar .tb-metric-value { font-size: 17pt; }
+.avatar .tb-metric-label { font-size: 8pt; }
+.avatar .touchboard .data-table { font-size: 9.5pt; }
+.avatar .progress-row { font-size: 9.5pt; margin-bottom: 3mm; grid-template-columns: 24mm 1fr 13mm; }
+.avatar .progress-track { height: 3mm; }
+.avatar .touchboard .blk, .avatar .tb-note { background: var(--night-2); color: var(--on-night-2); padding: 2.4mm 3mm; margin-top: 3mm; font-size: 8.5pt; }
+.avatar .role-card { padding: 3.6mm 0; grid-template-columns: 34mm 1fr; }
+.avatar .role-name { font-size: 13.5pt; }
+.avatar .role-dissonance { font-size: 12pt; }
+.avatar .role-value { font-size: 9.5pt; }
+.avatar .role-label { font-size: 8pt; }
+.avatar .shluz-card { padding: 5mm 5.5mm; }
+.avatar .shluz-name { font-size: 14pt; }
+.avatar .shluz-meta { font-size: 8.5pt; }
+.avatar .shluz-desc { font-size: 10pt; }
+.avatar .tb-v7-item { padding: 4.5mm 3mm; }
+.avatar .tb-v7-item-title { font-size: 12pt; }
+.avatar .status-item { padding: 3.2mm 4mm; font-size: 9pt; }
+.avatar .status-item strong, .avatar .status-value, .avatar .status-item b { font-size: 12.5pt; }
+
+.avatar .layer--wide { grid-template-columns: 1fr; }
+.avatar .plasma-scene { position: relative; background: none; -webkit-mask-image: none; mask-image: none; }
+.avatar .plasma-scene::before { content: ""; position: absolute; inset: 0 0 6mm; background: url("assets/sphere.webp") center / 44mm no-repeat;
+  -webkit-mask-image: radial-gradient(closest-side, #000 58%, transparent 100%); mask-image: radial-gradient(closest-side, #000 58%, transparent 100%); }
+.avatar .plasma-label { position: relative; }
+
+/* ======================================================================
+   Plasma (body.plasma-doc): разделы веб-страницы, разложенные по листам
+   ====================================================================== */
+.plasma-doc .page.sheet { font-size: 10.5pt; line-height: 1.5; }
+.plasma-doc .hero-grid { display: grid; grid-template-columns: 74mm 1fr; gap: 8mm; flex-grow: 1; }
+.plasma-doc .lead { font-size: 11.5pt; line-height: 1.5; }
+.plasma-doc .lead-hint { margin-top: 4mm; color: var(--ink-2); }
+.plasma-doc .blk-body { flex-grow: 1; display: flex; flex-direction: column; gap: 6mm; }
+.plasma-doc .blk-lead { font-size: 11.5pt; line-height: 1.5; max-width: 200mm; }
+
+/* Макет экрана: авторская раскладка плашек вокруг сферы, тёмный экран сайта */
+.plasma-doc .mock { position: relative; min-height: 128mm; background: var(--night); color: var(--on-night); }
+.plasma-doc .mock-top { display: flex; justify-content: space-between; padding: 4mm 5mm 3mm; font-size: 8pt; color: var(--on-night-2); box-shadow: inset 0 -0.3mm 0 #222a39; }
+.plasma-doc .mock-brand { color: var(--on-night); font-weight: 600; letter-spacing: 0.04em; }
+.plasma-doc .mock-brand span { margin-left: 3mm; font-weight: 400; color: var(--on-night-2); }
+.plasma-doc .chip { position: absolute; width: 46mm; background: var(--night-2); padding: 3mm 3.4mm; }
+.plasma-doc .chip-tl { top: 17mm; left: 5mm; }
+.plasma-doc .chip-tr { top: 17mm; right: 5mm; text-align: right; }
+.plasma-doc .chip-bl { bottom: 5mm; left: 5mm; }
+.plasma-doc .chip-br { bottom: 5mm; right: 5mm; text-align: right; }
+.plasma-doc .lbl { font-size: 7.5pt; color: var(--on-night-2); }
+.plasma-doc .val { font: 500 18pt/1.1 var(--sans); }
+.plasma-doc .val small { font-size: 9pt; color: var(--on-night-2); margin-left: 0.6mm; }
+.plasma-doc .bar { height: 0.9mm; background: #263044; margin-top: 2mm; }
+.plasma-doc .bar i { display: block; height: 100%; background: var(--light) !important; padding: 0; }
+.plasma-doc .mini-chart { position: absolute; left: 5mm; top: 50%; transform: translateY(-50%); width: 46mm; background: var(--night-2); padding: 3mm 3.4mm; }
+.plasma-doc .mini-chart .t { font-size: 7.5pt; color: var(--on-night-2); margin-bottom: 2mm; }
+.plasma-doc .mini-chart svg { display: block; width: 100%; height: 16mm; }
+.plasma-doc .mini-chart polyline { stroke: var(--light); opacity: 1; }
+.plasma-doc .mini-chart circle { fill: var(--light); }
+.plasma-doc .mini-months { display: flex; justify-content: space-between; margin-top: 1.4mm; font-size: 7pt; color: var(--on-night-2); }
+.plasma-doc .side-nav { position: absolute; right: 5mm; top: 50%; transform: translateY(-50%); width: 46mm; display: flex; flex-direction: column; gap: 0.8mm; }
+.plasma-doc .side-btn { background: var(--night-2); padding: 1.8mm 3mm; font-size: 8pt; text-align: center; color: var(--on-night-2); }
+.plasma-doc .side-btn.on { background: var(--light); color: var(--night); font-weight: 600; }
+.plasma-doc .sphere-wrap { position: absolute; top: 52%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+.plasma-doc .sphere-wrap .sphere { width: 50mm; aspect-ratio: 1; margin: 0 auto -3mm; background: url("assets/sphere.webp") center / contain no-repeat;
+  -webkit-mask-image: radial-gradient(closest-side, #000 60%, transparent 100%); mask-image: radial-gradient(closest-side, #000 60%, transparent 100%); }
+.plasma-doc .sphere-label { font-size: 7.5pt; color: var(--on-night-2); }
+.plasma-doc .sphere-value { font: 500 30pt/1.1 var(--sans); }
+
+/* Три карточки «Сейчас / Раньше / Дальше» */
+.plasma-doc .tri { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3.5mm; flex-grow: 1; }
+.plasma-doc .tri .card { padding: 6mm 6mm; }
+.plasma-doc .card-num { font: 600 10pt/1 var(--sans); color: var(--deep); margin-bottom: 4mm; }
+.plasma-doc .tri h3 { font: 500 20pt/1.1 var(--serif); margin-bottom: 3mm; }
+
+/* Четыре индекса */
+.plasma-doc .idx-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm 6mm; flex-grow: 1; }
+.plasma-doc .idx { background: var(--tone); padding: 5mm 5.5mm; display: flex; flex-direction: column; }
+.plasma-doc .idx-head { display: flex; align-items: baseline; justify-content: space-between; gap: 4mm; margin-bottom: 2mm; }
+.plasma-doc .idx-name { font: 600 16pt/1.1 var(--serif); }
+.plasma-doc .idx-code { font-size: 8.5pt; color: var(--ink-3); }
+.plasma-doc .idx-q { font: italic 500 12.5pt/1.3 var(--serif); margin-bottom: 2mm; }
+.plasma-doc .idx-desc { font-size: 9.5pt; line-height: 1.48; }
+.plasma-doc .idx-scale { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8mm; margin-top: auto; padding-top: 3mm; font-size: 8.5pt; line-height: 1.4; }
+.plasma-doc .idx-scale .s { padding: 2.6mm 3.2mm; background: var(--tone-2); }
+.plasma-doc .idx-scale .s.high { background: var(--night-2); color: var(--on-night); }
+.plasma-doc .idx-scale .s b, .plasma-doc .idx-scale .s strong { display: block; font-weight: 600; margin-bottom: 0.6mm; }
+.plasma-doc .idx-scale .s.high b, .plasma-doc .idx-scale .s.high strong { color: var(--light); }
+
+/* Деньги */
+.plasma-doc .formula-box { background: var(--night-2); color: var(--on-night); padding: 7mm 8mm; }
+.plasma-doc .formula { font: italic 500 26pt/1.2 var(--serif); color: var(--light); }
+.plasma-doc .formula-note { margin-top: 3mm; color: var(--on-night-2); }
+.plasma-doc .example { background: var(--tone); padding: 6mm 7mm; }
+.plasma-doc .example p + p { margin-top: 1.6mm; }
+.plasma-doc .example-hint { color: var(--ink-2); }
+
+/* Цикл */
+.plasma-doc .cycle { display: flex; gap: 0.8mm; font: 500 14pt/1.2 var(--serif); }
+.plasma-doc .cycle > * { flex: 1; background: var(--tone); padding: 6mm 5mm; }
+.plasma-doc .cycle-note { color: var(--ink-2); max-width: 220mm; }
+
+/* Plasma: карточки на всю высоту — заголовок сверху, текст снизу, кегль крупнее */
+.plasma-doc .tri .card { padding: 7mm 7mm; }
+.plasma-doc .tri h3 { font-size: 26pt; }
+.plasma-doc .tri .card p { margin-top: auto; font-size: 12.5pt; line-height: 1.5; }
+.plasma-doc .idx { padding: 6mm 7mm; }
+.plasma-doc .idx-name { font-size: 20pt; }
+.plasma-doc .idx-q { font-size: 15pt; margin: 2mm 0 4mm; }
+.plasma-doc .idx-desc { font-size: 11pt; line-height: 1.55; }
+.plasma-doc .idx-scale { font-size: 9.5pt; }
+.plasma-doc .example { font-size: 11.5pt; }
+
+.plasma-doc .blk-part { margin-top: 4mm; display: flex; flex-direction: column; gap: 4mm; }
+.plasma-doc .blk-part__title { font: 500 18pt/1.1 var(--serif); }
+.plasma-doc .blk-part__sub { margin-top: -2.6mm; font-size: 9.5pt; color: var(--ink-2); }
+.plasma-doc .cycle > :nth-child(even) { flex: 0 0 auto; background: none; padding: 6mm 1.4mm; color: var(--deep); }
+
+/* Лист «деньги + как работает»: два раздела, отступы плотнее */
+.plasma-doc .blk-body:has(.blk-part) { gap: 4mm; }
+.plasma-doc .blk-body:has(.blk-part) .formula-box { padding: 5mm 7mm; }
+.plasma-doc .blk-body:has(.blk-part) .formula { font-size: 22pt; }
+.plasma-doc .blk-body:has(.blk-part) .example { padding: 4mm 6mm; font-size: 10.5pt; }
+.plasma-doc .blk-body:has(.blk-part) .example p + p { margin-top: 0.8mm; }
+.plasma-doc .blk-part { margin-top: 1mm; gap: 3mm; }
+.plasma-doc .blk-body:has(.blk-part) .cycle > * { padding: 4mm 4.5mm; }
+.plasma-doc .blk-body:has(.blk-part) .cycle > :nth-child(even) { padding: 4mm 1.2mm; }
+
+/* Заголовки после выравнивания оглавления: выглядят как в оригинале */
+.page h3.was-h4 { font: 600 11pt/1.2 var(--serif); margin-bottom: 1.2mm; }
+.plasma-doc h3.blk-part__title { font: 500 18pt/1.1 var(--serif); }

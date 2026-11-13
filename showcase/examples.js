@@ -1,48 +1,49 @@
 // Реестр демонстрационных примеров витрины. Один источник для страницы просмотра (example.html),
-// лендинга и генератора превью/PDF (tools/previews.mjs). Чтобы добавить пример — добавьте запись
-// и запустите `npm run previews`.
-//   file    — исходный документ в этой папке (как прислал методолог, не правится)
-//   clip    — какую часть документа снять на превью: селектор элемента или высота от верха страницы
-//   pdf     — true, если документ свёрстан под печать и его можно отдать как PDF
+// страницы инструментов (tools.html) и генератора превью (tools/previews.mjs).
+// Документы лежат в showcase/docs/: это оформленные версии, их собирает tools/restyle.mjs
+// из оригиналов методолога, а PDF печатает tools/docs.mjs.
+//   file    — документ, который открывается в рамке
+//   pdf     — готовый PDF рядом с документом
+//   sheet   — номер листа, который снимается на превью (первый лист у всех одинаковый: обложка)
 window.HTDC_EXAMPLES = [
   {
     id: "instr-entry",
-    file: "Пример инструкции один.html",
+    file: "docs/instruction-entry.html",
+    pdf: "docs/instruction-entry.pdf",
     title: "Инструкция на входе: кандидат",
     product: "Управленческая инструкция",
-    clip: { selector: ".page", height: 905 },
-    pdf: true,
+    sheet: 2,
   },
   {
     id: "instr-probation",
-    file: "Пример инструкция два.html",
+    file: "docs/instruction-probation.html",
+    pdf: "docs/instruction-probation.pdf",
     title: "Инструкция после испытательного срока",
     product: "Управленческая инструкция",
-    clip: { selector: ".page", height: 905 },
-    pdf: true,
+    sheet: 2,
   },
   {
     id: "instr-veteran",
-    file: "Примеры инструкции три.html",
+    file: "docs/instruction-veteran.html",
+    pdf: "docs/instruction-veteran.pdf",
     title: "Инструкция для давнего сотрудника",
     product: "Управленческая инструкция",
-    clip: { selector: ".page", height: 905 },
-    pdf: true,
+    sheet: 2,
   },
   {
     id: "plasma",
-    file: "плазма пример.html",
+    file: "docs/plasma.html",
+    pdf: "docs/plasma.pdf",
     title: "Plasma: экран состояния компании",
     product: "Plasma",
-    clip: { selector: ".mock" },
-    pdf: false,
+    sheet: 2,
   },
   {
     id: "avatar",
-    file: "Аватар.html",
+    file: "docs/company-avatar.html",
+    pdf: "docs/company-avatar.pdf",
     title: "Аватар компании",
     product: "Аватар компании",
-    clip: { height: 800 },
-    pdf: true,
+    sheet: 2,
   },
 ];

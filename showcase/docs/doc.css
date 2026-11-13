@@ -1,0 +1,347 @@
+/* HTDC — документы. Лист A4 горизонтально, одинаково на экране и в PDF.
+   Рифма с сайтом: те же шрифты, холодная палитра, прямые углы, тональные плашки вместо рамок,
+   тёмная обложка со сферой. Внутренние листы — светлые: их читают и печатают. */
+
+@page { size: A4 landscape; margin: 0; }
+
+:root {
+  --paper: #f4f6f9;
+  --ink: #10141c;
+  --ink-2: #464e5e;
+  --ink-3: #545c6c;
+  --tone: #e5e9ef;
+  --tone-2: #d3dae4;
+  --deep: #2c4468;
+  --night: #080b12;
+  --night-2: #141a26;
+  --light: #d6e6f5;
+  --on-night: #e8eaee;
+  --on-night-2: #a9b0bc;
+
+  --serif: "Cormorant Garamond", "Times New Roman", serif;
+  --sans: "Golos Text", system-ui, "Segoe UI", sans-serif;
+
+  --pad-x: 16mm;
+  --pad-top: 13mm;
+  --pad-bottom: 11mm;
+  --gap: 7mm;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+/* В Cormorant от Google Fonts только старостильные цифры. Все числа набираются гротеском */
+body {
+  margin: 0;
+  background: #06080d;
+  color: var(--ink);
+  font: 400 9.5pt/1.45 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3, h4, p, ul, ol, dl, dd, table, figure { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+p { text-wrap: pretty; }
+strong { font-weight: 600; }
+::selection { background: var(--deep); color: #fff; }
+
+/* ---------- Лист ---------- */
+.sheet {
+  position: relative;
+  width: 297mm; height: 210mm;
+  margin: 10mm auto;
+  padding: var(--pad-top) var(--pad-x) var(--pad-bottom);
+  background: var(--paper);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  break-after: page; page-break-after: always;
+}
+.sheet:last-child { break-after: auto; page-break-after: auto; }
+
+@media print {
+  body { background: none; }
+  .sheet { margin: 0; }
+}
+
+/* Голова листа: заголовок и одна строка о том, что на листе */
+.sheet__head { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 0 12mm; margin-bottom: 8mm; }
+.sheet__title { font: 500 25pt/1.02 var(--serif); letter-spacing: -0.015em; text-wrap: balance; }
+.sheet__sub { grid-column: 1; margin-top: 2.5mm; color: var(--ink-2); font-size: 10.5pt; }
+.sheet__aside { grid-row: 1 / span 2; grid-column: 2; text-align: right; color: var(--ink-3); font-size: 8.5pt; line-height: 1.5; }
+.sheet__body { flex: 1; min-height: 0; }
+
+/* Колонтитул: имя документа слева, номер листа справа */
+.folio {
+  display: flex; justify-content: space-between; gap: 10mm;
+  margin-top: 6mm; padding-top: 3mm;
+  color: var(--ink-3); font-size: 7.5pt;
+  box-shadow: inset 0 0.3mm 0 var(--tone-2);
+}
+.folio b { font: 600 8.5pt/1 var(--serif); letter-spacing: 0.24em; color: var(--ink-2); margin-right: 3mm; }
+
+/* ---------- Сетка ---------- */
+.cols { display: grid; gap: var(--gap); align-items: start; }
+.cols--2 { grid-template-columns: 1fr 1fr; }
+.cols--3 { grid-template-columns: repeat(3, 1fr); }
+.cols--5-7 { grid-template-columns: 5fr 7fr; }
+.cols--7-5 { grid-template-columns: 7fr 5fr; }
+.cols--4-8 { grid-template-columns: 4fr 8fr; }
+.stack { display: grid; gap: 5mm; align-content: start; }
+.stack--tight { gap: 3mm; }
+.stretch { align-items: stretch; }
+.fill { height: 100%; align-items: stretch; }
+.spread { display: flex; flex-direction: column; justify-content: space-between; gap: 6mm; }
+.rows { display: grid; grid-template-rows: auto 1fr; gap: var(--gap); height: 100%; }
+.roomy { font-size: 11pt; line-height: 1.5; }
+.roomy .h3 { font-size: 17pt; margin-bottom: 4mm; }
+.roomy .dots { gap: 4mm; }
+.center { display: flex; flex-direction: column; justify-content: center; gap: 6mm; }
+
+/* ---------- Типографика блоков ---------- */
+.h3 { font: 600 13.5pt/1.15 var(--serif); letter-spacing: -0.005em; margin-bottom: 2mm; }
+.h4 { font: 600 9.5pt/1.3 var(--sans); margin-bottom: 1mm; }
+.statement { font: 500 17pt/1.22 var(--serif); letter-spacing: -0.005em; text-wrap: balance; }
+.statement--l { font-size: 24pt; line-height: 1.14; }
+.lead { font-size: 10.5pt; line-height: 1.5; }
+.muted { color: var(--ink-2); }
+.small { font-size: 8.5pt; color: var(--ink-2); }
+.quote { font: italic 500 14pt/1.3 var(--serif); }
+.quote::before { content: "«"; } .quote::after { content: "»"; }
+
+/* Список с точками */
+.dots { display: grid; gap: 2mm; }
+.dots li { position: relative; padding-left: 4.5mm; }
+.dots li::before { content: ""; position: absolute; left: 0.4mm; top: 0.62em; width: 1.6mm; height: 1.6mm; border-radius: 50%; background: var(--deep); }
+.dots--muted li::before { background: var(--ink-3); }
+
+/* Определения: «Термин. Пояснение» в столбик */
+.terms { display: grid; gap: 2.4mm; }
+.terms dt { font-weight: 600; }
+.terms dd { color: var(--ink-2); }
+.terms--row { grid-template-columns: max-content 1fr; column-gap: 5mm; row-gap: 2.4mm; }
+.terms--row dd { color: var(--ink); }
+
+/* ---------- Плашки ---------- */
+.panel { background: var(--tone); padding: 5mm 5.5mm; }
+.panel--deep { background: var(--tone-2); }
+.panel--night { background: var(--night-2); color: var(--on-night); }
+.panel--night .muted, .panel--night .small { color: var(--on-night-2); }
+.panel--night .h3, .panel--night strong { color: var(--light); }
+.panel--night .dots li::before { background: var(--light); }
+.panel + .panel { margin-top: 0; }
+
+/* Решение: три исхода в одной плашке */
+.verdict { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8mm; }
+.verdict > div { background: var(--tone); padding: 4mm 4.5mm; }
+.verdict > div:first-child { background: var(--night-2); color: var(--on-night); }
+.verdict dt { font: 600 11pt/1.2 var(--serif); margin-bottom: 1.2mm; }
+.verdict > div:first-child dt { color: var(--light); }
+
+/* Противопоставление: «одно ≠ другое» */
+.versus { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 4mm; text-align: center; }
+.versus span { display: block; color: var(--ink-3); font-size: 8pt; margin-bottom: 1mm; }
+.versus strong { display: block; font: 600 14pt/1.15 var(--serif); }
+.versus i { font: 400 20pt/1 var(--serif); color: var(--deep); font-style: normal; }
+
+/* Показатель: подпись, значение, полоса, «сейчас / если вырастет» */
+.metric { display: grid; grid-template-columns: 1fr auto; gap: 0.8mm 4mm; }
+.metric + .metric { margin-top: 3.4mm; }
+.metric__name { font-weight: 600; }
+.metric__value { font: 600 10.5pt/1 var(--sans); font-variant-numeric: tabular-nums; }
+.metric__bar { grid-column: 1 / -1; height: 1.6mm; background: var(--tone-2); position: relative; margin: 0.6mm 0 1mm; }
+.metric__bar i { position: absolute; inset: 0 auto 0 0; width: var(--v); background: var(--deep); }
+.metric__bar--inverse i { background: var(--ink-3); }
+.metric p { grid-column: 1 / -1; font-size: 8.5pt; }
+.metric p b { font-weight: 600; color: var(--ink-2); }
+
+/* Шкала готовности 0–4 */
+.scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.8mm; margin: 2mm 0 1.5mm; }
+.scale span { background: var(--tone-2); padding: 1.6mm 0; text-align: center; font: 600 8.5pt/1 var(--sans); color: var(--ink-3); }
+.scale span.on { background: var(--deep); color: #fff; }
+.scale-legend { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.8mm; font-size: 7pt; color: var(--ink-3); line-height: 1.3; }
+
+/* Таблицы: без сетки, разделение тоном строк */
+.table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+.table th { text-align: left; font-weight: 600; color: var(--ink-2); font-size: 8pt; padding: 0 3mm 2mm 0; }
+.table td { padding: 2.4mm 3mm 2.4mm 0; vertical-align: top; }
+.table tbody tr { box-shadow: inset 0 -0.3mm 0 var(--tone-2); }
+.table tbody tr:last-child { box-shadow: none; }
+.table td:first-child { font-weight: 600; }
+.table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.table th.num { text-align: right; }
+.table--roomy td { padding-block: 4mm; font-size: 9.5pt; }
+.table--panel tbody tr { box-shadow: inset 0 -0.3mm 0 #c6cfdb; }
+
+/* Метки: больше заливки — больше проблема */
+.mark { display: inline-flex; align-items: center; gap: 2mm; white-space: nowrap; font-weight: 600; }
+.mark::before { content: ""; width: 2.8mm; height: 2.8mm; border-radius: 50%; border: 0.45mm solid var(--deep); flex: none; }
+.mark--gap::before { background: linear-gradient(90deg, var(--deep) 50%, transparent 50%); }
+.mark--conflict::before { background: var(--ink); border-color: var(--ink); }
+.marks-legend { display: flex; gap: 6mm; font-size: 8pt; color: var(--ink-2); }
+.marks-legend .mark { font-weight: 400; }
+
+/* Реплики: «вместо — скажите» */
+.swap { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8mm; }
+.swap > div { padding: 3mm 4mm; background: var(--tone); }
+.swap > div + div { background: var(--tone-2); }
+.swap span { display: block; font-size: 7.5pt; color: var(--ink-3); margin-bottom: 0.8mm; }
+.swap p { font: italic 500 11pt/1.25 var(--serif); }
+.swap + .swap { margin-top: 0.8mm; }
+
+/* Шаги по порядку: номер — заголовок — текст. Номер здесь несёт смысл: это последовательность */
+.steps { display: grid; gap: 3mm; counter-reset: step; }
+.steps li { display: grid; grid-template-columns: 6mm 1fr; column-gap: 2mm; counter-increment: step; }
+.steps li::before { content: counter(step); grid-row: span 2; font: 600 10.5pt/1.3 var(--sans); color: var(--deep); }
+.steps b { font-weight: 600; }
+
+/* Цепочка: шаг → шаг → шаг */
+.chain { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0.8mm; }
+.chain li { position: relative; background: var(--tone); padding: 3.5mm 7mm 3.5mm 4.5mm; }
+.chain li:not(:last-child)::after {
+  content: ""; position: absolute; right: 2.6mm; top: 50%;
+  width: 1.8mm; height: 1.8mm; margin-top: -0.9mm;
+  border-top: 0.4mm solid var(--deep); border-right: 0.4mm solid var(--deep);
+  transform: rotate(45deg);
+}
+.chain span { display: block; font-size: 7.5pt; color: var(--ink-3); margin-bottom: 0.6mm; }
+
+/* Что пробовали: попытка — результат, плитками в ряд, последняя — вывод */
+.tried ul { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0.8mm; }
+.tried li { background: var(--tone); padding: 2.6mm 3.6mm; font-size: 8.5pt; }
+.tried b { display: block; font-weight: 600; font-size: 9pt; margin-bottom: 1mm; }
+.tried .tried__out { background: var(--night-2); color: var(--on-night); }
+.tried .tried__out b { color: var(--light); }
+
+/* Изменение показателя: было → стало */
+.delta { display: grid; grid-template-columns: 1fr auto; gap: 1mm 4mm; font-size: 9pt; }
+.delta b { font: 600 9.5pt/1.3 var(--sans); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Крупные цифры */
+.figure { display: grid; gap: 0.6mm; }
+.figure b { font: 500 21pt/1 var(--sans); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.figure span { font-size: 8.5pt; color: var(--ink-2); }
+
+/* ---------- Обложка ---------- */
+.cover {
+  background: var(--night);
+  color: var(--on-night);
+  padding: 15mm 18mm 13mm;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  grid-template-rows: auto 1fr auto;
+}
+.cover__mark { grid-area: 1 / 1; font: 600 13pt/1 var(--serif); letter-spacing: 0.32em; }
+.cover__kind { grid-area: 1 / 2; justify-self: end; color: var(--on-night-2); font-size: 9pt; position: relative; z-index: 1; }
+.cover__main { grid-area: 2 / 1; align-self: center; padding-right: 6mm; }
+.cover__title { font: 500 40pt/1 var(--serif); letter-spacing: -0.02em; text-wrap: balance; }
+.cover__who { margin-top: 5mm; font: 500 17pt/1.25 var(--serif); color: var(--light); }
+.cover__meta { margin-top: 8mm; display: grid; grid-template-columns: max-content 1fr; gap: 1.6mm 6mm; font-size: 9pt; }
+.cover__meta dt { color: var(--on-night-2); }
+.cover__orb {
+  grid-area: 1 / 2 / 4 / 3;
+  align-self: center; justify-self: center;
+  width: 128mm; aspect-ratio: 1;
+  background: url("assets/sphere.webp") center / contain no-repeat;
+  -webkit-mask-image: radial-gradient(closest-side, #000 62%, transparent 100%);
+          mask-image: radial-gradient(closest-side, #000 62%, transparent 100%);
+}
+.cover__note { grid-area: 3 / 1; align-self: end; color: var(--on-night-2); font-size: 8pt; max-width: 120mm; }
+
+/* ---------- Экран (просмотр в браузере) ---------- */
+@media screen and (max-width: 1180px) {
+  /* Лист не переверстывается, а уменьшается целиком: так он совпадает с PDF */
+  body { zoom: var(--fit, 1); }
+}
+
+/* ---------- Графика для документов с данными ---------- */
+
+/* Показатель с коридором нормы: полоса — значение, светлая зона — норма */
+.norm { display: grid; grid-template-columns: 1fr auto; gap: 0.6mm 4mm; }
+.norm + .norm { margin-top: 4.2mm; }
+.norm__name { font-weight: 600; }
+.norm__value { font: 600 10.5pt/1 var(--sans); }
+/* Дорожка — шкала 0–100%, полоса потемнее — коридор нормы, тонкая линия — значение */
+.norm__track { grid-column: 1 / -1; position: relative; height: 3.4mm; background: var(--tone-2); margin: 0.8mm 0 0.6mm; }
+.norm__track s { position: absolute; top: 0; bottom: 0; left: var(--a); width: calc(var(--b) - var(--a)); background: #aebbcd; }
+.norm__track i { position: absolute; left: 0; top: 1.1mm; height: 1.2mm; width: var(--v); background: var(--deep); }
+.norm__track i::after { content: ""; position: absolute; right: -0.4mm; top: -1.1mm; width: 0.8mm; height: 3.4mm; background: var(--ink); }
+.norm p { grid-column: 1 / -1; font-size: 8.5pt; color: var(--ink-2); }
+.norm-legend { display: flex; gap: 6mm; font-size: 8pt; color: var(--ink-2); }
+.norm-legend span::before { content: ""; display: inline-block; vertical-align: 0.2mm; width: 5mm; height: 1.2mm; margin-right: 1.8mm; background: var(--deep); }
+.norm-legend span + span::before { height: 3mm; vertical-align: -0.6mm; background: #aebbcd; }
+
+/* Ряд ключевых цифр */
+.figures { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0.8mm; }
+.figures > div { background: var(--tone); padding: 4mm 4.5mm; }
+.figures > div.is-key { background: var(--night-2); color: var(--on-night); }
+.figures > div.is-key span { color: var(--on-night-2); }
+
+/* Загрузка участков */
+.load { display: grid; grid-template-columns: 22mm 1fr 12mm; align-items: center; gap: 2.2mm 3mm; font-size: 9pt; }
+.load i { display: block; height: 3.2mm; background: var(--tone-2); position: relative; }
+.load i::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--v); background: var(--ink-3); }
+.load i.is-max::after { background: var(--ink); }
+.load b { font-weight: 600; text-align: right; }
+.table .load { min-width: 34mm; }
+
+/* Линия динамики */
+.trend { width: 100%; height: auto; overflow: visible; }
+.trend text { font-family: var(--sans); font-size: 4.6px; fill: var(--ink-3); }
+.trend .trend__line { fill: none; stroke: var(--deep); stroke-width: 1.6; }
+.trend .trend__grid { stroke: var(--tone-2); stroke-width: 0.6; }
+.trend circle { fill: var(--paper); stroke: var(--deep); stroke-width: 1.4; }
+.trend .trend__val { font-weight: 600; fill: var(--ink); }
+
+/* Карточка роли */
+.role { display: grid; grid-template-columns: 34mm 1fr 1fr; gap: 0 5mm; padding: 3.4mm 0; box-shadow: inset 0 -0.3mm 0 var(--tone-2); }
+.role:last-child { box-shadow: none; }
+.role__who b { display: block; font: 600 12pt/1.2 var(--serif); }
+.role__who span { font-size: 8.5pt; color: var(--ink-2); }
+.role__belief { grid-column: 2 / -1; font: italic 500 11.5pt/1.3 var(--serif); margin-bottom: 1.6mm; }
+.role dl { display: contents; }
+.role dt { font-size: 8pt; color: var(--ink-3); }
+.role dd { font-size: 9pt; }
+.role__col { display: grid; gap: 0.6mm; align-content: start; }
+
+/* Статус проверки */
+.status { display: inline-block; padding: 0.8mm 2.4mm; font-size: 8pt; font-weight: 600; background: var(--tone-2); }
+.status--on { background: var(--deep); color: #fff; }
+
+/* Макет экрана Plasma: тёмная панель внутри светлого листа */
+.screen {
+  position: relative; height: 100%;
+  background: var(--night); color: var(--on-night);
+  display: grid; grid-template-columns: 1fr 1.25fr 1fr; grid-template-rows: auto 1fr 1fr 1fr;
+  gap: 3mm; padding: 4mm 5mm 5mm;
+}
+.screen__top { grid-column: 1 / -1; display: flex; justify-content: space-between; font-size: 8pt; color: var(--on-night-2); padding-bottom: 2mm; box-shadow: inset 0 -0.3mm 0 #222a39; }
+.screen__top b { color: var(--on-night); font-weight: 600; letter-spacing: 0.04em; margin-right: 3mm; }
+.screen__chip { background: var(--night-2); padding: 3mm 3.5mm; align-self: start; }
+.screen__chip span { display: block; font-size: 7.5pt; color: var(--on-night-2); }
+.screen__chip b { font: 500 17pt/1.1 var(--sans); }
+.screen__chip i { display: block; height: 0.8mm; margin-top: 1.6mm; background: #263044; position: relative; }
+.screen__chip i::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--v); background: var(--light); }
+.screen__chip--r { text-align: right; }
+.screen__chip--low { align-self: end; }
+.screen__core { grid-column: 2; grid-row: 2 / 5; display: grid; place-items: center; align-content: center; text-align: center; }
+.screen__orb { width: 44mm; aspect-ratio: 1; background: url("assets/sphere.webp") center / contain no-repeat; -webkit-mask-image: radial-gradient(closest-side, #000 62%, transparent 100%); mask-image: radial-gradient(closest-side, #000 62%, transparent 100%); }
+.screen__core span { font-size: 7.5pt; color: var(--on-night-2); margin-top: 1mm; }
+.screen__core b { font: 500 26pt/1 var(--sans); }
+.screen__trend { background: var(--night-2); padding: 3mm 3.5mm; align-self: center; }
+.screen__trend span { font-size: 7.5pt; color: var(--on-night-2); }
+.screen__trend svg { display: block; width: 100%; margin-top: 2mm; }
+.screen__tabs { display: grid; gap: 1.2mm; align-self: center; }
+.screen__tabs span { background: var(--night-2); padding: 1.8mm 3mm; font-size: 8pt; text-align: center; color: var(--on-night-2); }
+.screen__tabs span.on { background: var(--light); color: var(--on-light, #06080d); font-weight: 600; }
+
+/* Шкала «низко — высоко» у показателя */
+.poles { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8mm; margin-top: 3mm; }
+.poles > div { background: var(--tone-2); padding: 2.6mm 3.4mm; font-size: 8.5pt; }
+.poles > div + div { background: var(--night-2); color: var(--on-night); }
+.poles b { display: block; font-weight: 600; margin-bottom: 0.6mm; }
+.poles > div + div b { color: var(--light); }
+
+/* Формула */
+.formula { font: italic 500 18pt/1.25 var(--serif); }
+.quad { grid-template-rows: 1fr 1fr; height: 100%; row-gap: 10mm; align-items: stretch; }
+.quad .roomy .h3 { font-size: 16pt; }
+.quad .poles > div { padding: 3.4mm 4mm; font-size: 9pt; }

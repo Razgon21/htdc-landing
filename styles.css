@@ -11,6 +11,7 @@
   --ink: #e8eaee;
   --ink-2: #a9b0bc;
   --dim: #6d7789;
+  --dim-2: #8892a6;                    /* приглушённый крупный текст: не ниже 3:1 на тумане */
   --light: #d6e6f5;
   --on-light: #06080d;
   --sheet: #dfe4eb;
@@ -23,6 +24,7 @@
   /* Роли. Между соседними ступенями не меньше 1,25× */
   --t-display: clamp(3rem, 1.85rem + 4.6vw, 6rem);
   --t-h2: clamp(2.125rem, 1.45rem + 2.7vw, 4rem);
+  --t-slide: clamp(2.125rem, 1.3rem + 3.3vw, 4.5rem);
   --t-term: clamp(1.875rem, 1.35rem + 1.9vw, 3rem);
   --t-h3: clamp(1.5rem, 1.3rem + 0.8vw, 2rem);
   --t-lead: clamp(1.125rem, 1.04rem + 0.36vw, 1.3125rem);
@@ -36,6 +38,7 @@
   --section: clamp(112px, 13vw, 208px);
   --head-gap: clamp(48px, 6vw, 96px);
   --pad: clamp(24px, 3vw, 44px);
+  --nav-h: 80px;
 
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -65,6 +68,7 @@ img, svg, canvas { display: block; max-width: 100%; }
 a { color: inherit; }
 p { text-wrap: pretty; }
 [hidden] { display: none !important; }
+.nb { white-space: nowrap; }
 ::selection { background: var(--light); color: var(--on-light); }
 :focus-visible { outline: 2px solid var(--light); outline-offset: 4px; }
 
@@ -184,12 +188,13 @@ p { text-wrap: pretty; }
 /* ---------- Навигация ---------- */
 .nav {
   position: sticky; top: 0; z-index: 10;
-  display: flex; align-items: center; justify-content: space-between; gap: 24px;
-  padding: 18px var(--margin);
+  display: flex; align-items: center; gap: 24px;
+  height: var(--nav-h);
+  padding: 0 var(--margin);
   background: var(--bg);
   transition: background-color 0.6s var(--ease);
 }
-.nav[data-top] { background: transparent; }
+.nav[data-top]:not([data-open]) { background: transparent; }
 .nav__mark {
   font: 600 1.5rem/1 var(--serif);
   font-variant-caps: all-small-caps;
@@ -197,40 +202,154 @@ p { text-wrap: pretty; }
   text-decoration: none;
   padding-block: 8px;
 }
-.nav__links { display: flex; gap: clamp(20px, 2.4vw, 36px); margin-left: auto; }
+.nav__links { display: flex; gap: clamp(18px, 2.2vw, 34px); margin-left: auto; }
 .nav__links a {
-  padding-block: 8px;
+  position: relative;
+  padding-block: 10px;
   color: var(--ink); text-decoration: none; font-size: var(--t-small);
   transition: color 0.4s var(--ease);
 }
-.nav__links a:hover { color: var(--light); }
+.nav__links a:hover, .nav__links a[aria-current] { color: var(--light); }
+/* Текущий раздел отмечен точкой света под ссылкой */
+.nav__links a::after {
+  content: ""; position: absolute; left: 50%; bottom: 0;
+  width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%;
+  background: var(--light);
+  opacity: 0; transform: scale(0);
+  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+}
+.nav__links a[aria-current]::after { opacity: 1; transform: none; }
+.nav__toggle {
+  display: none; position: relative; flex: none;
+  width: 44px; height: 44px; margin-right: -10px; padding: 0;
+  border: 0; background: transparent; color: var(--ink); cursor: pointer;
+}
+/* Две полоски складываются в крест */
+.nav__toggle::before, .nav__toggle::after {
+  content: ""; position: absolute; left: 10px; right: 10px; height: 2px;
+  background: currentColor;
+  transition: transform 0.4s var(--ease), top 0.4s var(--ease);
+}
+.nav__toggle::before { top: 17px; }
+.nav__toggle::after { top: 25px; }
+.nav__toggle[aria-expanded="true"]::before { top: 21px; transform: rotate(45deg); }
+.nav__toggle[aria-expanded="true"]::after { top: 21px; transform: rotate(-45deg); }
 
-/* ---------- Первый экран ---------- */
-.hero {
-  min-height: calc(100svh - 80px);
+/* ---------- Вступление: четыре экрана ----------
+   Без движения и без скрипта это четыре обычных экрана друг под другом.
+   С движением (.motion) сцена закреплена: экраны лежат стопкой и сменяются по прокрутке,
+   а сфера переходит из слота в слот. Слот каждого экрана стоит на своём месте и своего размера. */
+.intro { margin-top: calc(var(--nav-h) * -1); }
+.slide {
+  position: relative;
+  min-height: 100vh; min-height: 100svh;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   column-gap: var(--gutter);
-  align-items: center;
-  padding: clamp(24px, 4vw, 48px) var(--margin) clamp(56px, 7vw, 112px);
+  padding: calc(var(--nav-h) + 24px) var(--margin) clamp(96px, 13vh, 136px);
 }
-.hero__title {
-  font: 500 var(--t-display)/0.94 var(--serif);
-  letter-spacing: -0.03em;
-  max-width: 11ch;
+.slide__title {
+  font: 500 var(--t-slide)/1.02 var(--serif);
+  letter-spacing: -0.02em;
   text-wrap: balance;
 }
-.hero__lead {
-  margin-top: 36px;
-  max-width: 33rem;
-  font-size: var(--t-lead);
-  line-height: 1.5;
+.slide__title em { font-style: italic; color: var(--light); }
+.slide__lead {
+  margin-top: clamp(20px, 2.6vh, 32px);
+  max-width: 36rem;
+  color: #c6ccd6;
+  line-height: 1.62;
 }
-.hero__actions {
-  margin-top: 44px;
+.slide__lead strong { font-weight: 500; color: #fff; }
+.slide__actions {
+  margin-top: clamp(24px, 3.4vh, 40px);
   display: flex; flex-wrap: wrap; align-items: center; gap: 20px 32px;
 }
-.hero__orb { justify-self: center; width: min(36vw, 520px); }
+
+/* 1. Неведомое: текст внизу, далёкий размытый свет вверху справа */
+.slide--unknown .slide__text { align-self: end; }
+.slide--unknown .slide__orb { align-self: start; justify-self: end; width: min(19vw, 30vh, 290px); margin: 8vh 9vw 0 0; }
+/* 2. Человеческий фактор: текст вверху, свет ближе, внизу у осевой линии */
+.slide--factor .slide__text { align-self: start; padding-top: 3vh; }
+.slide--factor .slide__orb { align-self: end; justify-self: start; width: min(29vw, 46vh, 430px); margin-left: 5vw; }
+/* 3. Ресурс: текст по центру, сфера в фокусе справа */
+.slide--source .slide__text { align-self: center; }
+.slide--source .slide__orb { align-self: center; justify-self: center; width: min(35vw, 60vh, 530px); }
+/* 4. Предложение: сфера собралась в точку света над заголовком */
+.slide--offer {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center; align-content: center;
+  row-gap: clamp(28px, 4.4vh, 52px);
+  text-align: center;
+}
+.slide--offer .slide__orb { width: clamp(88px, 10vw, 144px); }
+.slide--offer .slide__title { font-size: var(--t-display); line-height: 0.94; letter-spacing: -0.03em; }
+.slide--offer .slide__lead { margin-inline: auto; max-width: 40rem; font-size: var(--t-lead); line-height: 1.5; color: var(--ink); }
+.slide--offer .slide__actions { justify-content: center; }
+
+.intro__ui { display: none; }
+
+.motion .intro { height: calc(var(--n, 4) * 100vh); height: calc(var(--n, 4) * 100svh); }
+.motion .intro__stage {
+  position: sticky; top: 0;
+  height: 100vh; height: 100svh;
+  overflow: hidden;
+}
+.motion .slide { position: absolute; inset: 0; min-height: 0; pointer-events: none; }
+.motion .slide__text {
+  opacity: var(--o, 0);
+  transform: translate3d(0, calc(var(--d, 0) * -72px), 0);
+  filter: blur(calc((1 - var(--o, 0)) * 12px));
+  will-change: opacity, transform;
+}
+.motion .slide.is-on .slide__text { pointer-events: auto; }
+/* Первый экран при загрузке проявляется из тумана: сначала вопрос, потом пояснение */
+.motion .slide--unknown .slide__title { animation: appear 1.8s var(--ease-out) 0.15s both; }
+.motion .slide--unknown .slide__lead { animation: appear 1.8s var(--ease-out) 0.65s both; }
+@keyframes appear { from { opacity: 0; transform: translateY(22px); filter: blur(10px); } }
+
+/* Управление вступлением: полоски экранов, пауза, «Дальше» */
+.motion .intro__ui {
+  position: absolute; left: var(--margin); right: var(--margin); bottom: clamp(20px, 4vh, 40px);
+  display: flex; align-items: center; gap: 14px;
+  animation: appear 1.6s var(--ease-out) 1.2s both;
+}
+.intro__dots { display: flex; gap: 6px; }
+.dot, .intro__play {
+  position: relative; flex: none;
+  height: 32px; padding: 0;
+  border: 0; background: transparent; color: var(--ink); cursor: pointer;
+}
+.dot { width: 44px; }
+.dot::before, .dot::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 15px; height: 2px;
+  background: rgba(214, 230, 245, 0.26);
+}
+.dot::after { background: var(--light); transform: scaleX(0); transform-origin: left; transition: transform 0.5s var(--ease); }
+.dot:hover::before { background: rgba(214, 230, 245, 0.5); }
+.dot[data-done]::after, .dot[aria-current]::after { transform: scaleX(1); }
+.dot[data-done]:not([aria-current])::after { opacity: 0.5; }
+/* Пока идёт автолистание, полоска текущего экрана заполняется за время ожидания */
+.dot[data-run]::after { animation: fill var(--hold, 10s) linear both; transition: none; }
+@keyframes fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.intro__play { width: 32px; }
+.intro__play::before {
+  content: ""; position: absolute; left: 11px; top: 10px; width: 10px; height: 12px;
+  background: linear-gradient(90deg, currentColor 0 3px, transparent 3px 7px, currentColor 7px 10px);
+}
+.intro__play[data-paused]::before { background: currentColor; clip-path: polygon(0 0, 100% 50%, 0 100%); }
+.intro__next {
+  margin-left: auto;
+  display: inline-flex; align-items: center; gap: 16px;
+  min-height: 44px; padding: 0;
+  border: 0; background: transparent; color: var(--ink); cursor: pointer;
+  font: 500 var(--t-small)/1 var(--sans);
+}
+.intro__next::after {
+  content: ""; width: 36px; height: 1px; background: currentColor;
+  transition: width 0.6s var(--ease);
+}
+.intro__next:hover::after { width: 60px; }
 
 /* ---------- Ситуации: чекбоксы слева, разбор справа ---------- */
 .situations { padding: var(--section) var(--margin) 0; }
@@ -246,7 +365,7 @@ p { text-wrap: pretty; }
   transition: background-color 0.4s var(--ease);
 }
 .check:hover { background: var(--tile-2); }
-.check[data-on] { background: #1d2536; }
+.check[data-on] { background: rgba(38, 49, 73, 0.8); }
 .check input {
   appearance: none; -webkit-appearance: none;
   width: 26px; height: 26px; margin: 0;
@@ -290,10 +409,30 @@ html:not(.js) .reading__empty { display: none; }
 
 @keyframes rise { from { opacity: 0; transform: translateY(12px); } }
 
-/* ---------- Чем не является: крупные строки ---------- */
-.not__rows { display: grid; gap: clamp(40px, 5vw, 72px); }
-.not__rows li { align-items: baseline; }
-.not__rows p { font-size: var(--t-lead); line-height: 1.5; max-width: 30rem; }
+/* ---------- Строки с указателем: принципы на главной, хроника на странице истории ----------
+   Слева у каждой строки гнездо. Сфера стоит в гнезде той строки, что сейчас в центре экрана,
+   и перелетает к следующей. Строка под сферой яркая, остальные приглушены. */
+.rules { padding: var(--section) var(--margin) 0; }
+.guide {
+  --orb: clamp(40px, 4.4vw, 64px);
+  --rail: calc(var(--orb) + clamp(16px, 2vw, 32px));
+  display: grid; gap: clamp(44px, 5.4vw, 80px);
+}
+.guide__row { align-items: baseline; }
+.guide .term { text-wrap: balance; }
+.guide__head { position: relative; padding-left: var(--rail); }
+.guide__slot {
+  position: absolute; left: 0; top: calc((var(--t-term) - var(--orb)) / 2);
+  width: var(--orb); border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(214, 230, 245, 0.24);
+  transition: box-shadow 0.6s var(--ease);
+}
+.guide__row > p, .guide__body { font-size: var(--t-lead); line-height: 1.5; max-width: 32rem; }
+.motion .guide__row .term, .motion .guide__row .chron__years { color: var(--dim-2); transition: color 0.7s var(--ease); }
+.motion .guide__row > p, .motion .guide__body { color: var(--ink-2); transition: color 0.7s var(--ease); }
+.motion .guide__row.is-on .term, .motion .guide__row.is-on .chron__years { color: var(--light); }
+.motion .guide__row.is-on > p, .motion .guide__row.is-on .guide__body { color: var(--ink); }
+.motion .guide__row.is-on .guide__slot { box-shadow: inset 0 0 0 1px transparent; }
 
 /* ---------- Что смотрим: сфера в центре, четыре вопроса по углам ---------- */
 /* Кольца шире сферы и вращаются: обрезаем их по секции, чтобы не расширяли страницу */
@@ -425,7 +564,10 @@ html:not(.js) .reading__empty { display: none; }
   padding: clamp(28px, 3.6vw, 56px);
   background: var(--tile);
 }
+.offer { position: relative; }
 .offer--main { background: var(--tile-2); }
+/* Место для мягкого света: он встаёт за верхним краем главной карточки */
+.offer__light { position: absolute; right: 14%; top: 0; width: 56px; height: 1px; }
 .offer__title { font: 500 var(--t-term)/1 var(--serif); letter-spacing: -0.02em; max-width: 11ch; text-wrap: balance; }
 .offer .lead { margin-top: 24px; }
 .offer .facts { margin: 36px 0 44px; }
@@ -452,11 +594,10 @@ html:not(.js) .reading__empty { display: none; }
 .sheet { display: grid; gap: 4px; text-decoration: none; }
 .sheet__frame {
   display: block; overflow: hidden;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 297 / 210;
   background: #121722;
   margin-bottom: 14px;
 }
-.sheet--wide .sheet__frame { aspect-ratio: 16 / 9; }
 .sheet__frame img {
   width: 100%; height: 100%;
   object-fit: cover; object-position: top center;
@@ -474,6 +615,67 @@ html:not(.js) .reading__empty { display: none; }
   transition: text-decoration-color 0.4s var(--ease), text-underline-offset 0.4s var(--ease);
 }
 .sheet:hover .sheet__open { text-decoration-color: var(--light); text-underline-offset: 9px; }
+
+.showcase__all { margin-top: clamp(40px, 5vw, 64px); }
+.sheets--tools .sheet__name { font: 500 var(--t-h3)/1.12 var(--serif); letter-spacing: -0.01em; margin-top: 6px; }
+.sheets--tools .sheet__meta { margin-top: 6px; max-width: 26rem; }
+
+/* ---------- История: ось из шести периодов, сфера стоит на последнем ---------- */
+.past { padding: var(--section) var(--margin) 0; }
+.past__more { margin-top: 32px; }
+.past__axis {
+  position: relative;
+  display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));
+  padding-top: 44px;
+}
+.past__axis::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 12px; height: 1px;
+  background: rgba(214, 230, 245, 0.24);
+}
+.past__axis li { position: relative; padding-right: 20px; }
+.past__axis li::before {
+  content: ""; position: absolute; left: 0; top: -36.5px;
+  width: 9px; height: 9px; border-radius: 50%; background: var(--dim-2);
+}
+.past__axis a { display: grid; gap: 8px; padding-block: 4px; text-decoration: none; }
+.past__years { font: 500 var(--t-h3)/1.1 var(--serif); letter-spacing: -0.01em; transition: color 0.4s var(--ease); }
+.past__what { color: var(--ink-2); font-size: var(--t-small); max-width: 14rem; }
+.past__axis a:hover .past__years, .past__now .past__years { color: var(--light); }
+.past__now::before { display: none; }
+.past__slot {
+  position: absolute; left: -17px; top: -55px; width: 44px; border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(214, 230, 245, 0.24);
+}
+
+/* ---------- Внутренние страницы: инструменты и история ---------- */
+.page-head {
+  min-height: min(76svh, 680px);
+  align-items: center;
+  padding: clamp(40px, 6vw, 96px) var(--margin) 0;
+}
+.page-head__title {
+  font: 500 var(--t-display)/0.94 var(--serif);
+  letter-spacing: -0.03em;
+  max-width: 12ch;
+  text-wrap: balance;
+}
+.page-head .lead { margin-top: 32px; }
+.page-head__orb { justify-self: center; width: min(28vw, 360px); }
+.crumb { margin-bottom: 24px; font-size: var(--t-small); }
+.crumb a { display: inline-block; padding-block: 4px; }
+.showcase--page { padding-top: clamp(72px, 9vw, 144px); }
+.chron { padding: clamp(72px, 9vw, 144px) var(--margin) 0; }
+.chron__years { font: 500 var(--t-term)/1 var(--serif); letter-spacing: -0.02em; }
+.chron__title { margin-top: 12px; font: 500 var(--t-h3)/1.12 var(--serif); letter-spacing: -0.01em; max-width: 18ch; text-wrap: balance; }
+.guide__body { display: grid; gap: 16px; }
+.guide__body strong { font-weight: 600; color: var(--ink); }
+.guide__row[id] { scroll-margin-top: 120px; }
+.closing { padding: var(--section) var(--margin); }
+.closing .split { align-items: center; }
+.closing .h2 { max-width: 18ch; }
+.closing .lead { margin-top: 28px; }
+.closing__actions { margin-top: 40px; display: flex; flex-wrap: wrap; align-items: center; gap: 20px 32px; }
+.closing__orb { justify-self: center; width: min(18vw, 220px); }
 
 /* ---------- Вопросы ---------- */
 .faq__aside { position: sticky; top: 120px; align-self: start; }
@@ -558,8 +760,10 @@ html:not(.js) .reading__empty { display: none; }
   color: #5b6476;
   margin-left: -0.04em;
 }
+.footer__nav { margin-top: 48px; display: flex; flex-wrap: wrap; gap: 8px 40px; font-size: var(--t-small); }
+.footer__nav a { display: inline-block; padding-block: 6px; }
 .footer__row {
-  margin-top: 48px;
+  margin-top: 28px;
   display: flex; flex-wrap: wrap; gap: 16px 48px;
   color: var(--ink-2); font-size: var(--t-small);
 }
@@ -609,7 +813,28 @@ html:not(.js) .reading__empty { display: none; }
 
 /* ---------- Планшет ---------- */
 @media (max-width: 1100px) {
+  /* Разделы уходят в меню на весь экран */
   .nav__links { display: none; }
+  .nav__cta { margin-left: auto; }
+  .js .nav__toggle { display: block; }
+  .js .nav__links {
+    position: fixed; inset: var(--nav-h) 0 0 0;
+    display: flex; flex-direction: column; gap: 4px;
+    margin: 0; padding: 24px var(--margin) 40px;
+    background: var(--bg);
+    overflow-y: auto; overscroll-behavior: contain;
+    visibility: hidden; opacity: 0; transform: translateY(-12px);
+    transition: opacity 0.4s var(--ease), transform 0.4s var(--ease), visibility 0s linear 0.4s;
+  }
+  .js .nav[data-open] .nav__links { visibility: visible; opacity: 1; transform: none; transition-delay: 0s; }
+  .js .nav__links a { padding-block: 12px; font: 500 var(--t-h3)/1.12 var(--serif); letter-spacing: -0.01em; }
+  .js .nav__links a::after { left: auto; right: 0; bottom: 50%; margin: 0 0 -2.5px; }
+  html[data-menu] { overflow: hidden; }
+  .past__axis { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 72px; }
+  .past__axis li:nth-child(n + 4)::after {
+    content: ""; position: absolute; left: 0; right: 0; top: -32px; height: 1px;
+    background: rgba(214, 230, 245, 0.24);
+  }
   .case { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .lens__orb { width: min(30vw, 340px); }
   .facts--row { grid-template-columns: 1fr; }
@@ -620,11 +845,21 @@ html:not(.js) .reading__empty { display: none; }
   .split { grid-template-columns: 1fr; row-gap: 28px; }
   .head { margin-bottom: 40px; }
 
-  .hero { grid-template-columns: 1fr; align-items: start; min-height: 0; row-gap: 0; padding-top: 16px; }
-  /* Сфера над заголовком: при загрузке резкая, при скролле уходит вверх, не проходя под текстом */
-  .hero__orb { order: -1; width: min(50vw, 240px); justify-self: end; margin-bottom: 8px; }
-  .hero__lead { margin-top: 24px; }
-  .hero__actions { margin-top: 32px; }
+  /* Вступление: свет сверху, текст снизу */
+  .slide {
+    grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(112px, 1fr) auto;
+    row-gap: 12px;
+    padding: calc(var(--nav-h) + 4px) var(--margin) 88px;
+  }
+  .slide__orb { order: -1; }
+  .slide--unknown .slide__text, .slide--factor .slide__text, .slide--source .slide__text { align-self: end; padding-top: 0; }
+  .slide--unknown .slide__orb { align-self: center; justify-self: end; width: min(34vw, 20vh, 150px); margin: 0 8vw 0 0; }
+  .slide--factor .slide__orb { align-self: center; justify-self: center; width: min(46vw, 24vh, 210px); margin: 0; }
+  .slide--source .slide__orb { align-self: center; justify-self: center; width: min(58vw, 28vh, 260px); }
+  .slide--offer { grid-template-rows: none; }
+  .slide--offer .slide__orb { width: min(26vw, 112px); }
+  .slide__lead { margin-top: 16px; line-height: 1.55; }
+  .motion .slide__text { transform: translate3d(0, calc(var(--d, 0) * -40px), 0); }
 
   .situations__body { row-gap: 4px; }
   .reading { position: static; scroll-margin-top: 80px; }
@@ -642,7 +877,21 @@ html:not(.js) .reading__empty { display: none; }
   .situations__bar[data-has][data-visible] { transform: none; visibility: visible; transition-delay: 0s; }
   .situations__bar .btn { min-height: 48px; padding: 0 20px; flex: none; }
 
-  .not__rows li { row-gap: 12px; }
+  .guide { --orb: 36px; --rail: 52px; gap: 44px; }
+  .guide__row { row-gap: 12px; }
+  .guide__row > p, .guide__body { padding-left: var(--rail); }
+
+  .past__axis { grid-template-columns: 1fr; row-gap: 24px; padding: 0 0 0 32px; }
+  .past__axis::before { left: 4px; right: auto; top: 12px; bottom: 12px; width: 1px; height: auto; }
+  .past__axis li:nth-child(n + 4)::after { display: none; }
+  .past__axis li { padding-right: 0; }
+  .past__axis li::before { left: -32px; top: 13px; }
+  .past__slot { left: -45px; top: -1px; width: 36px; }
+  .past__what { max-width: none; }
+
+  .page-head { min-height: 0; padding-top: 24px; row-gap: 0; }
+  .page-head__orb { order: -1; width: min(44vw, 200px); justify-self: end; margin-bottom: 8px; }
+  .closing__orb { display: none; }
 
   .lens__title { text-align: left; }
   .lens__stage { min-height: 0; display: grid; gap: 72px; place-items: start; }
@@ -679,10 +928,14 @@ html:not(.js) .reading__empty { display: none; }
 }
 
 @media (max-width: 560px) {
-  .nav { padding-block: 12px; }
+  :root { --nav-h: 64px; }
+  .nav { gap: 12px; }
   .nav__mark { font-size: 1.3rem; }
+  .nav__more { display: none; }
   .btn--small { padding: 0 18px; font-size: 0.875rem; }
-  .hero__actions .btn, .offer > .btn, .offer__actions .btn, .form__submit { width: 100%; }
+  .slide__actions .btn, .offer > .btn, .offer__actions .btn, .form__submit, .closing__actions .btn { width: 100%; }
+  .slide--offer .slide__actions { flex-direction: column; }
+  .dot { width: 32px; }
   .check { gap: 16px; }
   .case { grid-template-columns: 1fr; }
   .case li { padding: 28px 20px 32px; }
